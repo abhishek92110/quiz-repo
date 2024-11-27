@@ -1,14 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Nav from './Nav';
+import { AppContext } from './context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 function AdminQuestion2() {
+    const contextValue = useContext(AppContext);
     const [questionType, setQuestionType] = useState('objective');
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState({ A: '', B: '', C: '', D: '' });
     const [answer, setAnswer] = useState('');
     const [category, setCategory] = useState('');
+    const [newCategory, setNewCategory] = useState('');
+    const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
     const [file, setFile] = useState(null);
+    const [allCategory, setAllCategory] = useState([]);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        getAllCategory();
+
+        verifyAmin()
+    }, []);
+
+    const verifyAmin = async()=>{
+        const response = await contextValue.verifyAdmin()
+
+        if(!(response.status)){
+           navigate('/admin-login') 
+        }
+    }
+
+    const getAllCategory = async () => {
+        let response = await fetch("http://localhost:8000/all-category", {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        response = await response.json();
+        console.log("response all category =", response);
+
+        setAllCategory(response.allCategory);
+    };
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -47,15 +83,26 @@ function AdminQuestion2() {
     const handleAddQuestion = async (e) => {
         e.preventDefault();
 
+        if (isAddingNewCategory && !newCategory.trim()) {
+            Swal.fire("Error", "Please enter a category name.", "error");
+            return;
+        }
+
         const newQuestion = {
             type: questionType,
             question,
-            category,
-            options,
+            category: isAddingNewCategory ? newCategory : category,
+            option1:options.A,
+            option2:options.B,
+            option3:options.C,
+            option4:options.D,
             answer,
         };
 
         try {
+            // If a new category is being added, save it to the backend first.
+           
+            // Add the question
             const response = await fetch('http://localhost:8000/add-question', {
                 method: 'POST',
                 headers: {
@@ -92,7 +139,7 @@ function AdminQuestion2() {
                             <option value="subjective">Subjective</option>
                         </select>
                     </div>
-                    <div>
+                    <div className='add-question-section'>
                         <label>Question:</label>
                         <textarea value={question} onChange={(e) => setQuestion(e.target.value)} />
                     </div>
@@ -132,18 +179,54 @@ function AdminQuestion2() {
                             </div>
                             <div>
                                 <label>Answer:</label>
-                                <input type="text" value={answer} onChange={(e) => setAnswer(e.target.value)} />
+                                <select onChange={(e) => setAnswer(options[e.target.value])} required>
+                                    <option value="">Select the correct answer</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
                             </div>
                         </>
                     )}
                     <div>
                         <label>Category:</label>
-                        <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} />
+                        {isAddingNewCategory ? (
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="Enter new category"
+                                    value={newCategory}
+                                    onChange={(e) => setNewCategory(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddingNewCategory(false)}
+                                >
+                                    Select Existing
+                                </button>
+                            </div>
+                        ) : (
+                            <div>
+                                <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+                                    <option value="">Select the category</option>
+                                    {allCategory.map((data, index) => (
+                                        <option key={index} value={data.category}>{data.category}</option>
+                                    ))}
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddingNewCategory(true)}
+                                >
+                                    Add New Category
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <button type="submit">Add Question</button>
                 </form>
 
-                <h3>Bulk Upload Questions</h3>
+                <h3 className='my-4'>Bulk Upload Questions</h3>
                 <form onSubmit={handleBulkUpload}>
                     <div>
                         <label>Upload Excel/CSV File:</label>

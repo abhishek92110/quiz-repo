@@ -6,10 +6,12 @@ const saveQuiz  = require("../model/SaveQuiz")
 const jwt = require('jsonwebtoken');
 const verifyUser = require("../middleware/verifyUser")
 const categories = require("../model/Category")
+const admin = require("../model/Admin")
 const multer = require('multer');
 const Papa = require('papaparse'); // For CSV parsing
 const xlsx = require('xlsx'); // For Excel parsing
 const fs = require('fs');
+const verifyAdmin = require('../middleware/verifyAdmin');
 const upload = multer({ dest: 'uploads/' });
 
 const jwt_secret = 'www'; 
@@ -98,6 +100,7 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
 router.post('/add-question', async (req, res) => {
     console.log("add question running")
     try {
+        console.log("req body add-question =",req.body)
         const { question, option1, option2, option3, option4, answer, category, type } = req.body;
 
         // Create a new question
@@ -159,10 +162,13 @@ router.post('/add-user', async (req, res) => {
     try {
         const data = req.body;
 
+        console.log("data from add-user route=",data)
+
         // Check if a user with the same email already exists
         const existingUser = await user.findOne({ email: data.email });
 
-        if (existingUser) {
+        if (existingUser) 
+            {
             // Generate a token with the user's ID
             const token = jwt.sign({ userId: existingUser._id, userName:existingUser.name, userEmail:existingUser.email }, jwt_secret);
 
@@ -186,7 +192,49 @@ router.post('/add-user', async (req, res) => {
     }
 });
 
+// admin login route
 
+router.post('/admin-login', async (req, res) => {
+    try {
+        const data = req.body;
+        console.log("data admin login route =",data)
+
+        // Check if a user with the same email already exists
+       
+        const adminData = await admin.find({email:data.email, password:data.password})
+
+            if(adminData.length>0){
+
+                const token = jwt.sign({ Id: adminData[0]._id, email:adminData[0].email }, jwt_secret);
+
+                res.status(201).json({ status: true, token:token});
+            }
+
+            else{
+                res.status(201).json({ status: false});
+            }
+
+    } catch (error) {
+        console.error('Error adding user:', error);
+        res.status(500).json({ status: false, error: 'Server error' });
+    }
+});
+router.get('/verify-admin',verifyAdmin, async (req, res) => {
+    try {
+
+        // Check if a user with the same email already exists
+       if(req.message){
+        res.send({status:true})
+       }
+       else{
+        res.send({status:false})
+       }
+
+    } catch (error) {
+        console.error('Error adding user:', error);
+        res.status(500).json({ status: false, error: 'Server error' });
+    }
+});
 
 
 router.post('/save-quiz-question', verifyUser, async (req, res) => {

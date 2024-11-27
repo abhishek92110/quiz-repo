@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from './context/AppContext';
 import Nav from './Nav';
 import Loading from './Loading';
 
 
 const UserAnswered = () => {
+    const contextValue = useContext(AppContext);
     const [UserAnswer, setUserAnswer] = useState([])
     const [loadingStatus, setLoadingStatus] = useState(false)
     const [answerStatus, setAnswerStatus] = useState(false)
@@ -15,7 +17,18 @@ const UserAnswered = () => {
 
         getUnAnswerUser()
 
+        verifyAmin()
+       
     },[answerStatus])
+
+    const verifyAmin = async()=>{
+      const response = await contextValue.verifyAdmin()
+
+      if(!(response.status)){
+         navigate('/admin-login') 
+      }
+  }
+
 
     const getUnAnswerUser = async()=>{
       setLoadingStatus(true)

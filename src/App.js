@@ -13,6 +13,7 @@ import UserAnswered from './component/UserAnswered';
 import UpdateMarks from './component/UpdateMarks';
 import { AppProvider } from './component/context/AppContext';
 import AdminQuestion2 from './component/AdminQuestion2';
+import Adminlogin from './component/Adminlogin';
 
 function App() {
   return (
@@ -34,8 +35,9 @@ function App() {
  <Route path="/quiz" element={<Quiz /> }/>
  <Route path="/new-quiz" element={<NewQuiz /> }/>
  <Route path="/quiz-result" element={<Result /> }/>
- <Route path="/admin-question" element={<AdminQuestion /> }/>
- <Route path="/admin-question2" element={<AdminQuestion2 /> }/>
+ <Route path="/admin-login" element={<Adminlogin /> }/>
+ {/* <Route path="/admin-question2" element={<AdminQuestion /> }/> */}
+ <Route path="/admin-question" element={<AdminQuestion2 /> }/>
     </Routes>
   
   </BrowserRouter>

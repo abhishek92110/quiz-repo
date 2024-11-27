@@ -10,6 +10,8 @@ function Result() {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState(localStorage.getItem("category") || "software-testing");
   const [allCategory, setAllCategory] = useState([])
+  const [animate, setAnimate] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false)
 
   let marks = "";
   let question = "";
@@ -21,6 +23,7 @@ function Result() {
 
   useEffect(() => {
     // Reset data and fetch new data when category changes
+    setAnimate(true);
     setQuizData([]);
     setLoading(true);
     fetchQuizData();
@@ -50,6 +53,9 @@ function Result() {
 
   const fetchQuizData = async () => {
     console.log("Selected category:", category);
+
+    setLoadingStatus(true)
+
     try {
       const response = await fetch("http://localhost:8000/get-save-quiz-question", {
         method: "GET",
@@ -63,9 +69,15 @@ function Result() {
       const data = await response.json();
       console.log("Fetched data:", data);
 
+      setTimeout(()=>{
+        console.log("set time out running")
+        setLoadingStatus(false)
+      },2000)
+
       if (data.status && data.userAnswer.length > 0) {
         setQuizData(data.userAnswer[0]); // Update state with fetched data
         updatemarks(data.userAnswer[0]);
+
       } else {
         setQuizData([]); // Clear state if no data is found
       }
@@ -139,8 +151,11 @@ function Result() {
       {/* Navbar */}
       <Nav />
 
+{loadingStatus && <Loading/>}
       {/* Tab Navigation */}
-      <div className="category-result-section">
+      <div className={`${loadingStatus && "overlay"} ${animate ? "slide-in" : ""}`}>
+
+      <div className="category-result-section ">
         <div className="tabs">
           <button
             className={`tab-button ${activeTab === "stats" ? "active" : ""}`}
@@ -224,6 +239,7 @@ function Result() {
         <div>No data available for the selected category.</div>
       )}
     </div>
+</div>
   );
 }
 

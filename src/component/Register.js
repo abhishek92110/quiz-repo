@@ -131,7 +131,8 @@ function App() {
       if (response.ok) {
         setLoadingStatus(false);
         navigate('/select-quiz');
-      } 
+      }
+        
       else {
         alert(result2.message || 'Google Login failed');
       }

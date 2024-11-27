@@ -11,8 +11,23 @@ export const AppProvider = ({ children }) => {
     setLoggedInStatus(data)
   }
 
+  const verifyAdmin = async()=>{
+
+    let response = await fetch("http://localhost:8000/verify-admin", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "token": localStorage.getItem("adminToken"),
+      },
+    });
+
+    response = await response.json()
+
+    return response
+  }
+
   return (
-    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus }}>
+    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin }}>
       {children}
     </AppContext.Provider>
   );

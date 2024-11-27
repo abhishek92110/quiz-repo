@@ -61,6 +61,7 @@ function Quiz() {
   
 
   const getAllQuestion = async () => {
+
     let response = await fetch("http://localhost:8000/get-question", {
       method: 'GET',
       headers: {
@@ -73,9 +74,11 @@ function Quiz() {
 
     console.log("quiz question=",response)
     setAllQuestion(response.question);
+    
   };
 
   const handleOptionSelect = (option) => {
+    console.log("handle option =",option)
     const updatedAnswers = [...userAnswers];
     updatedAnswers[currentQuestionIndex] = option;
     setUserAnswers(updatedAnswers);
@@ -213,14 +216,13 @@ function Quiz() {
                       {['option1', 'option2', 'option3', 'option4'].map((option, index) => {
                         const optionLetter = ['A', 'B', 'C', 'D'][index];
                         return (
-                          <div key={option} className="option">
+                          <div key={option} className="option" onClick={() => handleOptionSelect(allQuestion[currentQuestionIndex][option])} >
                             <input
                               type="radio"
                               name={`question-${currentQuestionIndex}`}
                               value={allQuestion[currentQuestionIndex][option]}
                               disabled={!startStatus}
                               checked={userAnswers[currentQuestionIndex] === allQuestion[currentQuestionIndex][option]}
-                              onChange={() => handleOptionSelect(allQuestion[currentQuestionIndex][option])}
                             />
                             <label>
                               {optionLetter}. {allQuestion[currentQuestionIndex][option]}

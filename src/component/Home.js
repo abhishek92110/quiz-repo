@@ -15,7 +15,7 @@ function Home() {
     <div className="home-container">
       <Nav />
       <div className="home-btn-container">
-        <button onClick={()=>{localStorage.setItem("loggedInStatus","admin");navigate("/admin")}}>Admin</button>
+        <button onClick={()=>{localStorage.setItem("loggedInStatus","admin");navigate("/admin-login")}}>Admin</button>
         <button onClick={()=>{localStorage.setItem("loggedInStatus","student");navigate("/register")}}>Student</button>
       </div>
     </div>
