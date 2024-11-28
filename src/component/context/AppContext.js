@@ -13,7 +13,7 @@ export const AppProvider = ({ children }) => {
 
   const verifyAdmin = async()=>{
 
-    let response = await fetch("http://localhost:8000/verify-admin", {
+    let response = await fetch("https://blockey.in:8000/verify-admin", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -25,9 +25,23 @@ export const AppProvider = ({ children }) => {
 
     return response
   }
+  const verifyUser = async()=>{
+
+    let response = await fetch("https://blockey.in:8000/verify-user", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "token": localStorage.getItem("token"),
+      },
+    });
+
+    response = await response.json()
+
+    return response
+  }
 
   return (
-    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin }}>
+    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin, verifyUser }}>
       {children}
     </AppContext.Provider>
   );

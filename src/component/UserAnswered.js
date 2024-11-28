@@ -32,7 +32,7 @@ const UserAnswered = () => {
 
     const getUnAnswerUser = async()=>{
       setLoadingStatus(true)
-        let data = await fetch("http://localhost:8000/get-user-saved-answer", {
+        let data = await fetch("https://blockey.in:8000/get-user-saved-answer", {
             method: 'GET',
             headers: {
               "Content-Type": "application/json",
@@ -57,7 +57,7 @@ const handleShow = (data)=>{
     localStorage.setItem('userId',data.user)
     localStorage.setItem('category',data.category)
 
-    navigate("/update-marks")
+    answerStatus==false?navigate("/update-marks"):navigate("/student-result")
 
 }
 
@@ -87,7 +87,7 @@ const handleShow = (data)=>{
       <th scope="col">Name</th>
       <th scope="col">Email</th>
       <th scope="col">Category</th>
-      <th scope="col">View</th>
+      <th scope="col">{answerStatus==false?"View":"Result"}</th>
     </tr>
   </thead>
   <tbody>
@@ -101,7 +101,7 @@ const handleShow = (data)=>{
                 <td>{data.username}</td>
                 <td>{data.useremail}</td>
                 <td>{data.category}</td>
-                <td className='pointer' onClick={()=>handleShow(data)}><i class="fa-regular fa-eye"></i></td>
+                <td className='pointer' onClick={()=>handleShow(data)}>{answerStatus==false?<i class="fa-regular fa-eye"></i>:<i class="fa-solid fa-square-poll-horizontal"></i>}</td>
             </tr>
         )
     })

@@ -30,6 +30,7 @@ const firebaseConfig =
 function App() {
   const navigate = useNavigate();
   const [loadingStatus, setLoadingStatus] = useState(false)
+  const [googleStatus, setGoogleStatus] = useState(false)
 
   // State to store form data
   const [formData, setFormData] = useState({
@@ -37,6 +38,7 @@ function App() {
     email: '',
     number: '',
     trainer: '',
+    course:''
   });
 
   // Handle input change
@@ -54,7 +56,7 @@ function App() {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await fetch("http://localhost:8000/add-user", {
+      const response = await fetch("https://blockey.in:8000/add-user", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -63,6 +65,7 @@ function App() {
       });
 
       const result = await response.json();
+      setGoogleStatus(false)
 
       console.log("result manual add =",result)
 
@@ -105,6 +108,9 @@ function App() {
       const user = result.user;
 
       // Prepare data to send to your backend
+
+      setFormData({["name"]:user.displayName, ["email"]:user.email})
+
       const googleUserData = {
         name: user.displayName,
         email: user.email,
@@ -112,30 +118,32 @@ function App() {
         trainer: '', // Optionally collect later
       };
 
+      setGoogleStatus(true)
+
       console.log("google user data =",googleUserData)
 
       // Send data to your API
-      const response = await fetch("http://localhost:8000/add-user", {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(googleUserData),
-      });
+      // const response = await fetch("https://blockey.in:8000/add-user", {
+      //   method: 'POST',
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(googleUserData),
+      // });
 
-      const result2 = await response.json();
-      localStorage.setItem("token", result2.token);
-      localStorage.setItem("name", result2.name);
+      // const result2 = await response.json();
+      // localStorage.setItem("token", result2.token);
+      // localStorage.setItem("name", result2.name);
       
 
-      if (response.ok) {
-        setLoadingStatus(false);
-        navigate('/select-quiz');
-      }
+      // if (response.ok) {
+      //   setLoadingStatus(false);
+      //   navigate('/select-quiz');
+      // }
         
-      else {
-        alert(result2.message || 'Google Login failed');
-      }
+      // else {
+      //   alert(result2.message || 'Google Login failed');
+      // }
     
   } catch (error) {
     console.error('Google Sign-In Error:', error);
@@ -151,6 +159,7 @@ function App() {
 <Nav/>
 {loadingStatus && <Loading/>}
 
+    {!googleStatus ? 
     <div className={`register-container ${loadingStatus && "overlay"}`}>
       <div className="register-form bg-cover-color">
         <h2>Create an Account</h2>
@@ -218,6 +227,53 @@ function App() {
         </div>
       </div>
     </div>
+    :
+    <div className={`register-container slide-in ${loadingStatus && "overlay"}`}>
+    <div className="register-form bg-cover-color">
+      <h2>Create an Account</h2>
+
+      <form onSubmit={register}>
+
+        <div className="form-group">
+          <label htmlFor="email">Course</label>
+          <input
+            type="text"
+            id="course"
+            placeholder="Enter your Course"
+            name="course"
+            value={formData.course}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="number">Contact Number</label>
+          <input
+            type="number"
+            id="number"
+            placeholder="Enter your Number"
+            name="number"
+            value={formData.number}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="trainer">Trainer's Name</label>
+          <input
+            type="text"
+            id="trainer"
+            placeholder="Enter Trainer's Name"
+            name="trainer"
+            value={formData.trainer}
+            onChange={handleChange}
+          />
+        </div>
+
+        <button type="submit" className="register-btn">Register</button>
+      </form>
+    </div>
+  </div>}
     </>
   );
 }

@@ -33,7 +33,7 @@ function AdminQuestion2() {
     }
 
     const getAllCategory = async () => {
-        let response = await fetch("http://localhost:8000/all-category", {
+        let response = await fetch("https://blockey.in:8000/all-category", {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -62,7 +62,7 @@ function AdminQuestion2() {
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:8000/upload-questions', {
+            const response = await fetch('https://blockey.in:8000/upload-questions', {
                 method: 'POST',
                 body: formData,
             });
@@ -103,7 +103,7 @@ function AdminQuestion2() {
             // If a new category is being added, save it to the backend first.
            
             // Add the question
-            const response = await fetch('http://localhost:8000/add-question', {
+            const response = await fetch('https://blockey.in:8000/add-question', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -81,7 +81,7 @@ function App() {
 
     // Send data to the API
     try {
-      const response = await fetch("http://localhost:8000/add-user", {
+      const response = await fetch("https://blockey.in:8000/add-user", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

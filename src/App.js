@@ -14,6 +14,7 @@ import UpdateMarks from './component/UpdateMarks';
 import { AppProvider } from './component/context/AppContext';
 import AdminQuestion2 from './component/AdminQuestion2';
 import Adminlogin from './component/Adminlogin';
+import StudentResult from './component/StudentResult';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
  <Route path="/" element={<Home/>}/>
  <Route path="/update-marks" element={<UpdateMarks/>}/>
  <Route path="/student-answer" element={<UserAnswered/>}/>
+ <Route path="/student-result" element={<StudentResult/>}/>
  <Route path="/admin" element={<Admin/>}/>
  {/* <Route path="/select-quiz" element={<Select /> }/> */}
  <Route path="/select-quiz" element={<QuizSelect /> }/>

@@ -31,7 +31,7 @@
 //   }
 
 //   const getAllCategory =async()=>{
-//     let response = await fetch("http://localhost:8000/all-category", {
+//     let response = await fetch("https://blockey.in:8000/all-category", {
 //       method: 'GET',
 //       headers: {
 //         "Content-Type": "application/json",
@@ -139,7 +139,7 @@ const QuizHomePage = () => {
   };
 
   const getAllCategory = async () => {
-    let response = await fetch("http://localhost:8000/all-category", {
+    let response = await fetch("https://blockey.in:8000/all-category", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",

@@ -230,7 +230,25 @@ router.get('/verify-admin',verifyAdmin, async (req, res) => {
         res.send({status:false})
        }
 
-    } catch (error) {
+    } 
+    catch (error) {
+        console.error('Error adding user:', error);
+        res.status(500).json({ status: false, error: 'Server error' });
+    }
+});
+router.get('/verify-user',verifyUser, async (req, res) => {
+    try {
+
+        // Check if a user with the same email already exists
+       if(req.message){
+        res.send({status:true})
+       }
+       else{
+        res.send({status:false})
+       }
+
+    } 
+    catch (error) {
         console.error('Error adding user:', error);
         res.status(500).json({ status: false, error: 'Server error' });
     }
@@ -304,9 +322,9 @@ router.get('/get-save-quiz-question-admin', async (req, res) =>
     {
     try
      {
-        const category = req.header("category")
-        const userId = req.header("id")
-        const status = req.header("status")
+        const category =   req.header("category")
+        const userId   =   req.header("id")
+        const status   =   req.header("status")
 
         // Include user ID from the middleware
 

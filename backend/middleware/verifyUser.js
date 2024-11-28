@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
+const user = require("../model/User")
 
 // Secret key for JWT
 const JWT_SECRET = 'www'; // Replace with a secure secret key
 
 // Middleware to verify token
-const verifyUserToken = (req, res, next) => {
+const verifyUserToken = async(req, res, next) => {
     
     console.log("verify user")
 
@@ -19,6 +20,22 @@ const verifyUserToken = (req, res, next) => {
         req.userId = decoded.userId; // Attach user ID to the request object
         req.userName = decoded.userName; // Attach user ID to the request object
         req.userEmail = decoded.userEmail; // Attach user ID to the request object
+
+
+        req.message=''
+
+        const userData = await user.find({email:decoded.email})
+
+        if(userData.length>0){
+
+            req.message=true
+
+        }
+
+        else{
+            req.message=false
+        }
+
         next(); // Proceed to the next middleware/route handler
     }
      catch (error) {

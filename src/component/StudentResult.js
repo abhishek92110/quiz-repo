@@ -4,7 +4,7 @@ import "jspdf-autotable"; // For table generation
 import Nav from "./Nav";
 import Loading from "./Loading";
 
-function Result() {
+function StudentResult() {
   const [activeTab, setActiveTab] = useState("stats"); // Set default tab to 'stats'
   const [quizData, setQuizData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +12,7 @@ function Result() {
   const [allCategory, setAllCategory] = useState([]);
   const [animate, setAnimate] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
+  const [name, setName] = useState();
   const [marks, setMarks] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -50,14 +51,17 @@ function Result() {
     setLoadingStatus(true);
 
     try {
-      const response = await fetch("https://blockey.in:8000/get-save-quiz-question", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          category,
-          token: localStorage.getItem("token"),
-        },
-      });
+        let response = await fetch(
+            "https://blockey.in:8000/get-save-quiz-question-admin",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                category: localStorage.getItem("category"),
+                id: localStorage.getItem("userId"),
+              },
+            }
+          );
 
       const data = await response.json();
       console.log("Fetched data:", data);
@@ -70,6 +74,8 @@ function Result() {
       if (data.status && data.userAnswer.length > 0) {
         setQuizData(data.userAnswer[0]); // Update state with fetched data
         updatemarks(data.userAnswer[0]);
+        setName(data.userAnswer[0].username)
+    setCategory(data.userAnswer[0].category)
       } else {
         setQuizData([]); // Clear state if no data is found
       }
@@ -136,7 +142,7 @@ function Result() {
       startY: 120,
     });
 
-    doc.save("quiz-results.pdf");
+    doc.save(`${name}-${category}-results.pdf`);
   };
 
   if (loading) {
@@ -193,6 +199,7 @@ function Result() {
             <div className="stats-container bg-cover-color">
               <h2>Learning is a journey. Keep going, and you'll get there.</h2>
               <div className="stats-details">
+                <div>Name: {name}</div>
                 <div>Grade: {grade}</div>
                 <div>Total Questions: {totalQuestions}</div>
                 <div>Correct Answers: {correctAnswers}</div>
@@ -238,4 +245,5 @@ function Result() {
   );
 }
 
-export default Result;
+export default StudentResult;
+  
