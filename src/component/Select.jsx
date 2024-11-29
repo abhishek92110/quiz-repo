@@ -20,7 +20,7 @@ const QuizApp = () => {
   return (
     <>
 
-  <Nav/>
+      <Nav status="student"/>
 
       {loadingStatus && <Loading/>}
 

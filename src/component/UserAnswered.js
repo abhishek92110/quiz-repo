@@ -55,8 +55,7 @@ const handleShow = (data)=>{
 
     console.log("data =",data)
     localStorage.setItem('userId',data.user)
-    localStorage.setItem('category',data.category)
-
+    localStorage.setItem('userCourse',data.category)
     answerStatus==false?navigate("/update-marks"):navigate("/student-result")
 
 }

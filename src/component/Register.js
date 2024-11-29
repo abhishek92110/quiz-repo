@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from './context/AppContext';
 import { signInWithPopup, GoogleAuthProvider, signInWithRedirect, signInWithCredential, getAuth } from "firebase/auth";
 
 
@@ -28,9 +29,11 @@ const firebaseConfig =
 };
 
 function App() {
+  const contextValue = useContext(AppContext);
   const navigate = useNavigate();
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [googleStatus, setGoogleStatus] = useState(false)
+  const [allCourse, setAllCourse] = useState([])
 
   // State to store form data
   const [formData, setFormData] = useState({
@@ -40,6 +43,33 @@ function App() {
     trainer: '',
     course:''
   });
+
+  useEffect(()=>{
+
+    
+    verifyUser()
+    getAllCourse()
+
+
+  },[])
+
+  const verifyUser = async()=>{
+   
+    const response = await contextValue.verifyUser()
+
+    if((response.status)){
+        navigate('/select-quiz')
+    }
+}
+
+  const getAllCourse = async()=>{
+
+    let data = await contextValue.getAllCourse()
+
+    console.log("all Course context =",data)
+
+    setAllCourse(data.allCourse.allCourse)
+  }
 
   // Handle input change
   const handleChange = (e) => {
@@ -71,6 +101,7 @@ function App() {
 
       localStorage.setItem("token",result.token);
       localStorage.setItem("name",result.name)
+      localStorage.setItem("userCourse",result.course)
 
       if (response.ok) {
         setLoadingStatus(false)
@@ -235,15 +266,21 @@ function App() {
       <form onSubmit={register}>
 
         <div className="form-group">
-          <label htmlFor="email">Course</label>
-          <input
-            type="text"
-            id="course"
-            placeholder="Enter your Course"
-            name="course"
-            value={formData.course}
-            onChange={handleChange}
-          />
+          <label htmlFor="course">Course</label>
+          
+          <select
+              className="custom-select"
+              name="course"
+              onChange={handleChange}
+              
+            >
+              <option selected disabled>--- Select Category ---</option>
+              {allCourse.length > 0 && allCourse.map((data, index) => {
+                return (
+                  <option key={index} value={data.mainCourse}>{data.mainCourse}</option>
+                );
+              })}
+            </select>
         </div>
 
         <div className="form-group">

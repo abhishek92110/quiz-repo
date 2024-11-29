@@ -20,7 +20,7 @@ const verifyUserToken = async(req, res, next) => {
         req.userId = decoded.userId; // Attach user ID to the request object
         req.userName = decoded.userName; // Attach user ID to the request object
         req.userEmail = decoded.userEmail; // Attach user ID to the request object
-
+        req.course = decoded.course; // Attach user ID to the request object
 
         req.message=''
 

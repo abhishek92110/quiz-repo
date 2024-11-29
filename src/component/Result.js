@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable"; // For table generation
 import Nav from "./Nav";
+import { AppContext } from './context/AppContext';
 import Loading from "./Loading";
+import { useNavigate } from 'react-router-dom';
 
 function Result() {
+  const contextValue = useContext(AppContext);
   const [activeTab, setActiveTab] = useState("stats"); // Set default tab to 'stats'
   const [quizData, setQuizData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState(localStorage.getItem("category") || "software-testing");
-  const [allCategory, setAllCategory] = useState([]);
+  const [subCourse, setSubCourse] = useState([]);
   const [animate, setAnimate] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [marks, setMarks] = useState(0);
@@ -18,6 +21,8 @@ function Result() {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [percentage, setPercentage] = useState(0);
   const [grade, setGrade] = useState("F");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Reset data and fetch new data when category changes
@@ -28,21 +33,29 @@ function Result() {
   }, [category]);
 
   useEffect(() => {
-    getAllCategory();
+    getSubCourse();
+    verifyUser()
   }, []);
 
-  const getAllCategory = async () => {
-    let response = await fetch("https://blockey.in:8000/all-category", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const verifyUser = async()=>{
+   
+    const response = await contextValue.verifyUser()
 
-    response = await response.json();
-    console.log("response all category =", response);
-    setAllCategory(response.allCategory);
-  };
+    if(!(response.status)){
+        navigate('/register')
+    }
+}
+
+const getSubCourse = async()=>{
+  let data = await contextValue.getSubCourse();
+
+  console.log("data of sub course of result=",data.subCourse[0].subCourse)
+
+  setSubCourse(data.subCourse[0].subCourse)
+}
+
+  
+ 
 
   const fetchQuizData = async () => {
     console.log("Selected category:", category);
@@ -146,7 +159,7 @@ function Result() {
   return (
     <div>
       {/* Navbar */}
-      <Nav />
+     <Nav status="student"/>
 
       {loadingStatus && <Loading />}
       {/* Tab Navigation */}
@@ -178,9 +191,9 @@ function Result() {
               value={category}
             >
               <option selected disabled>--- Select Category ---</option>
-              {allCategory.length > 0 && allCategory.map((data, index) => {
+              {subCourse.length > 0 && subCourse.map((data, index) => {
                 return (
-                  <option key={index} value={data.category}>{data.category}</option>
+                  <option key={index} value={data.course}>{data.course}</option>
                 );
               })}
             </select>

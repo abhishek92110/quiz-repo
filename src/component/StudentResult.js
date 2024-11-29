@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable"; // For table generation
 import Nav from "./Nav";
+import { AppContext } from './context/AppContext';
 import Loading from "./Loading";
 
 function StudentResult() {
+  const contextValue = useContext(AppContext);
   const [activeTab, setActiveTab] = useState("stats"); // Set default tab to 'stats'
   const [quizData, setQuizData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState(localStorage.getItem("category") || "software-testing");
-  const [allCategory, setAllCategory] = useState([]);
+  const [subCourse, setSubCourse] = useState([]);
   const [animate, setAnimate] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [name, setName] = useState();
@@ -29,21 +31,17 @@ function StudentResult() {
   }, [category]);
 
   useEffect(() => {
-    getAllCategory();
+    getSubCourse();
   }, []);
 
-  const getAllCategory = async () => {
-    let response = await fetch("https://blockey.in:8000/all-category", {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    response = await response.json();
-    console.log("response all category =", response);
-    setAllCategory(response.allCategory);
-  };
+  const getSubCourse = async()=>{
+    console.log("get sub course")
+    let data = await contextValue.getAllCourse();
+  
+    console.log("data of sub course of result=",data.subCourse)
+  
+    setSubCourse(data.subCourse)
+  }
 
   const fetchQuizData = async () => {
     console.log("Selected category:", category);
@@ -184,9 +182,10 @@ function StudentResult() {
               value={category}
             >
               <option selected disabled>--- Select Category ---</option>
-              {allCategory.length > 0 && allCategory.map((data, index) => {
+              {subCourse.length > 0 && subCourse.map((data, index) => {
+                {console.log("sub course design map =",data)}
                 return (
-                  <option key={index} value={data.category}>{data.category}</option>
+                  <option key={index} value={data}>{data}</option>
                 );
               })}
             </select>

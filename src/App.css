@@ -180,6 +180,11 @@
     padding: 2px !important;
     font-size: 12px;
   }
+
+  .category-result-section{
+    flex-direction: column;
+    row-gap: 20px;
+  }
 }
 
 @media screen and (max-width:400px){
@@ -223,6 +228,7 @@
 
 .slide-in {
   animation: slideInFromRight 0.8s ease-out;
+  padding: 15px;
 }
 
 
@@ -313,7 +319,7 @@
 
 /* QNA Container */
 .qna-container {
-  width: 80%;
+  /* width: 80%; */
   margin: 20px auto;
   text-align: center;
 }

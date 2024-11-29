@@ -40,8 +40,49 @@ export const AppProvider = ({ children }) => {
     return response
   }
 
+  const getAllCourse = async()=>{
+
+    let allCourse = await fetch("https://blockey.in:8000/all-course", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    allCourse = await allCourse.json()
+
+    let subCourse = [];
+
+    allCourse.allCourse.map(data=>{
+      data.subCourse.map(element=>{
+        subCourse.push(element.course)
+      })
+    })
+
+    return {allCourse:allCourse, subCourse:subCourse}
+
+  }
+  const getSubCourse = async()=>{
+
+    console.log("sub course useContext=",localStorage.getItem("userCourse"))
+
+    let subCourse = await fetch("https://blockey.in:8000/sub-course", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "mainCourse":localStorage.getItem("userCourse")
+      },
+    });
+
+    subCourse = await subCourse.json()
+
+    return subCourse
+
+  }
+
+
   return (
-    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin, verifyUser }}>
+    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin, verifyUser, getAllCourse, getSubCourse }}>
       {children}
     </AppContext.Provider>
   );

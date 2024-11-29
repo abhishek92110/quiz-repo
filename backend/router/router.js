@@ -6,6 +6,7 @@ const saveQuiz  = require("../model/SaveQuiz")
 const jwt = require('jsonwebtoken');
 const verifyUser = require("../middleware/verifyUser")
 const categories = require("../model/Category")
+const allCourse  = require("../model/AllCourse")
 const admin = require("../model/Admin")
 const multer = require('multer');
 const Papa = require('papaparse'); // For CSV parsing
@@ -45,12 +46,14 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
         let addedCount = 0; // Track successfully added questions
         let failedCount = 0; // Track failed questions
 
-        for (const question of questions) {
+        for (const question of questions) 
+            {
             try {
                 const { question: ques, option1, option2, option3, option4, answer, category, type } = question;
 
                 // Create a new question object
                 const newQuestion = new questiondb({
+
                     question: ques,
                     option1,
                     option2,
@@ -59,6 +62,7 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
                     answer,
                     type,
                     category
+                    
                 });
 
                 // Save the question to the database
@@ -78,7 +82,8 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
                 }
 
                 addedCount++;
-            } catch (error) {
+            }
+             catch (error) {
                 console.error('Error processing question:', question, error);
                 failedCount++;
             }
@@ -90,7 +95,8 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
             added: addedCount,
             failed: failedCount
         });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Error during bulk upload:', error);
         res.status(500).json({ status: false, message: 'Server error' });
     }
@@ -170,10 +176,12 @@ router.post('/add-user', async (req, res) => {
         if (existingUser) 
             {
             // Generate a token with the user's ID
-            const token = jwt.sign({ userId: existingUser._id, userName:existingUser.name, userEmail:existingUser.email }, jwt_secret);
+            const token = jwt.sign({ userId: existingUser._id, userName:data.name, userEmail:existingUser.email, course:data.course }, jwt_secret);
+
+            await user.updateOne({email: data.email},{$set: data})
 
             // Email already exists, return status true and token
-            return res.status(200).json({ status: true, token, name:existingUser.name });
+            return res.status(200).json({ status: true, token, name:data.name, course:data.course });
         }
 
         // Create a new user document
@@ -183,9 +191,9 @@ router.post('/add-user', async (req, res) => {
         const savedUser = await newUser.save();
 
         // Generate a token with the user's ID
-        const token = jwt.sign({ userId: savedUser._id,  userName:savedUser.name, userEmail:savedUser.email }, jwt_secret);
+        const token = jwt.sign({ userId: savedUser._id,  userName:data.name, userEmail:savedUser.email, course:data.course }, jwt_secret);
 
-        res.status(201).json({ status: true, user: savedUser, token, name:savedUser.name });
+        res.status(201).json({ status: true, user: savedUser, token, name:data.name, course:data.course });
     } catch (error) {
         console.error('Error adding user:', error);
         res.status(500).json({ status: false, error: 'Server error' });
@@ -403,6 +411,41 @@ router.get('/all-category', async (req, res) => {
     const allCategory = await categories.find({})
 
     res.send({ "status": "true", allCategory:allCategory });
+
+    }
+    catch(error){
+        console.log("all category route error =",error.message)
+        res.send({ "status": "false" });
+
+    }
+});
+
+router.get('/all-course', async (req, res) => {
+
+    console.log("all course get route")
+    try{
+
+    const allCourseData = await allCourse.find({})
+
+    res.send({ "status": "true", allCourse:allCourseData });
+
+    }
+    catch(error){
+        console.log("all category route error =",error.message)
+        res.send({ "status": "false" });
+
+    }
+});
+router.get('/sub-course', async (req, res) => {
+
+    let mainCourse = req.header("mainCourse")
+
+    console.log("sub course get route",mainCourse)
+    try{
+
+    const subCourseData = await allCourse.find({mainCourse:mainCourse})
+
+    res.send({ "status": "true", subCourse:subCourseData });
 
     }
     catch(error){

@@ -3,6 +3,7 @@ import Nav from './Nav';
 import { AppContext } from './context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Loading from './Loading';
 
 function AdminQuestion2() {
     const contextValue = useContext(AppContext);
@@ -14,12 +15,13 @@ function AdminQuestion2() {
     const [newCategory, setNewCategory] = useState('');
     const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
     const [file, setFile] = useState(null);
-    const [allCategory, setAllCategory] = useState([]);
+    const [subCourse, setSubCourse] = useState([]);
+    const [loadingStatus, setLoadingStatus] = useState(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        getAllCategory();
+        getSubCourse();
 
         verifyAmin()
     }, []);
@@ -32,18 +34,16 @@ function AdminQuestion2() {
         }
     }
 
-    const getAllCategory = async () => {
-        let response = await fetch("https://blockey.in:8000/all-category", {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+    const getSubCourse = async () => {
+       
 
-        response = await response.json();
-        console.log("response all category =", response);
+        let data = await contextValue.getAllCourse()
 
-        setAllCategory(response.allCategory);
+        console.log("sub course =",data.subCourse)
+
+        setSubCourse(data.subCourse)
+
+
     };
 
     const handleFileChange = (e) => {
@@ -53,6 +53,7 @@ function AdminQuestion2() {
     const handleBulkUpload = async (e) => {
         e.preventDefault();
 
+        setLoadingStatus(true)
         if (!file) {
             Swal.fire("Error", "Please select a file to upload.", "error");
             return;
@@ -62,19 +63,23 @@ function AdminQuestion2() {
         formData.append('file', file);
 
         try {
-            const response = await fetch('https://blockey.in:8000/upload-questions', {
+            let response = await fetch('https://blockey.in:8000/upload-questions', {
                 method: 'POST',
                 body: formData,
             });
 
-            if (response.ok) {
-                const result = await response.json();
+             response = await response.json();
+
+            if (response.status) {
+                setLoadingStatus(false)
                 Swal.fire("Success", "Bulk upload successful!", "success");
                 setFile(null); // Reset file input
-            } else {
+            } 
+            else {
                 Swal.fire("Error", "Failed to upload questions.", "error");
             }
-        } catch (error) {
+        } 
+        catch (error) {
             console.error("Error uploading questions:", error);
             Swal.fire("Error", "Something went wrong during the upload.", "error");
         }
@@ -82,6 +87,8 @@ function AdminQuestion2() {
 
     const handleAddQuestion = async (e) => {
         e.preventDefault();
+
+        setLoadingStatus(true)
 
         if (isAddingNewCategory && !newCategory.trim()) {
             Swal.fire("Error", "Please enter a category name.", "error");
@@ -112,11 +119,13 @@ function AdminQuestion2() {
             });
 
             if (response.ok) {
+                setLoadingStatus(false)
                 Swal.fire("Success", "Question added successfully!", "success");
                 setQuestion('');
                 setOptions({ A: '', B: '', C: '', D: '' });
                 setAnswer('');
                 setCategory('');
+            
             } else {
                 Swal.fire("Error", "Failed to add question.", "error");
             }
@@ -129,6 +138,7 @@ function AdminQuestion2() {
     return (
         <>
             <Nav />
+            {loadingStatus && <Loading/>}
             <div className="admin-form">
                 <h3>Add a New Question</h3>
                 <form onSubmit={handleAddQuestion}>
@@ -191,37 +201,16 @@ function AdminQuestion2() {
                     )}
                     <div>
                         <label>Category:</label>
-                        {isAddingNewCategory ? (
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder="Enter new category"
-                                    value={newCategory}
-                                    onChange={(e) => setNewCategory(e.target.value)}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setIsAddingNewCategory(false)}
-                                >
-                                    Select Existing
-                                </button>
-                            </div>
-                        ) : (
+                       
                             <div>
                                 <select value={category} onChange={(e) => setCategory(e.target.value)} required>
                                     <option value="">Select the category</option>
-                                    {allCategory.map((data, index) => (
-                                        <option key={index} value={data.category}>{data.category}</option>
+                                    {subCourse.map((data, index) => (
+                                        <option key={index} value={data}>{data}</option>
                                     ))}
                                 </select>
-                                <button
-                                    type="button"
-                                    onClick={() => setIsAddingNewCategory(true)}
-                                >
-                                    Add New Category
-                                </button>
                             </div>
-                        )}
+                        
                     </div>
                     <button type="submit">Add Question</button>
                 </form>

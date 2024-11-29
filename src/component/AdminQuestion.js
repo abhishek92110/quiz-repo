@@ -4,7 +4,8 @@ import Nav from './Nav';
 import AlertMessage from './AlertMessage';
 import Swal from 'sweetalert2';
 
-function AdminQuestion() {
+function AdminQuestion() 
+{
     const [questionType, setQuestionType] = useState('objective'); // New state for question type
     const [question, setQuestion] = useState('');
     const [options, setOptions] = useState({ A: '', B: '', C: '', D: '' });
@@ -25,7 +26,8 @@ function AdminQuestion() {
             category
         };
 
-        if (questionType === 'objective') {
+        if (questionType === 'objective') 
+            {
             data.option1 = options.A;
             data.option2 = options.B;
             data.option3 = options.C;

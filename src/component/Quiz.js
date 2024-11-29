@@ -220,7 +220,7 @@ function Quiz() {
 
   return (
     <div>
-      <MemoizedNav />
+      <MemoizedNav status="student" />
 
       {loadingStatus && <Loading />}
 
