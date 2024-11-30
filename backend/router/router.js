@@ -23,7 +23,9 @@ router.get('/', async (req, res) => {
 
 
 router.post('/upload-questions', upload.single('file'), async (req, res) => {
-    console.log("Bulk question upload running");
+    const course = req.header("course")
+    console.log("Bulk question upload running", course);
+
     try {
         const filePath = req.file.path;
         let questions = [];
@@ -49,7 +51,10 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
         for (const question of questions) 
             {
             try {
-                const { question: ques, option1, option2, option3, option4, answer, category, type } = question;
+                const { question: ques, option1, option2, option3, option4, answer, type } = question;
+                let category = course
+
+                console.log("course in upload question = ",course)
 
                 // Create a new question object
                 const newQuestion = new questiondb({
@@ -61,9 +66,11 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
                     option4,
                     answer,
                     type,
-                    category
+                    category:course
                     
                 });
+
+                console.log("new Question =",newQuestion)
 
                 // Save the question to the database
                 const savedQuestion = await newQuestion.save();
@@ -142,7 +149,8 @@ router.post('/add-question', async (req, res) => {
         }
 
         res.status(201).json({ "status":true,message: 'Question added successfully', question: savedQuestion });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Error adding question:', error);
         res.status(500).json({"status":false, error: 'Server error' });
     }

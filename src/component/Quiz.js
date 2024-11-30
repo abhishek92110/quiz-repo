@@ -64,7 +64,7 @@ function Quiz() {
   const getAllQuestion = async () => {
     setLoadingStatus(true);
 
-    let response = await fetch('https://blockey.in:8000/get-question', {
+    let response = await fetch('http://localhost:8000/get-question', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ function Quiz() {
           : 0,
     }));
 
-    fetch('https://blockey.in:8000/save-quiz-question', {
+    fetch('http://localhost:8000/save-quiz-question', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ function Quiz() {
           : 0,
     }));
 
-    await fetch('https://blockey.in:8000/save-quiz-question', {
+    await fetch('http://localhost:8000/save-quiz-question', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -17,6 +17,7 @@ function AdminQuestion2() {
     const [file, setFile] = useState(null);
     const [subCourse, setSubCourse] = useState([]);
     const [loadingStatus, setLoadingStatus] = useState(false);
+    const [questionStatus, setQuestionStatus] = useState("single")
 
     const navigate = useNavigate();
 
@@ -63,8 +64,13 @@ function AdminQuestion2() {
         formData.append('file', file);
 
         try {
-            let response = await fetch('https://blockey.in:8000/upload-questions', {
+            let response = await fetch('http://localhost:8000/upload-questions', {
                 method: 'POST',
+                headers:{
+
+                    course:category,
+                },
+
                 body: formData,
             });
 
@@ -110,7 +116,7 @@ function AdminQuestion2() {
             // If a new category is being added, save it to the backend first.
            
             // Add the question
-            const response = await fetch('https://blockey.in:8000/add-question', {
+            const response = await fetch('http://localhost:8000/add-question', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -140,6 +146,11 @@ function AdminQuestion2() {
             <Nav />
             {loadingStatus && <Loading/>}
             <div className="admin-form">
+                <button onClick={()=>setQuestionStatus("single")} className='mx-4'>Single</button>
+                <button onClick={()=>setQuestionStatus("bulk")}>Bulk</button>
+                {
+                    questionStatus=="single" ?
+                    <>
                 <h3>Add a New Question</h3>
                 <form onSubmit={handleAddQuestion}>
                     <div>
@@ -190,7 +201,7 @@ function AdminQuestion2() {
                             <div>
                                 <label>Answer:</label>
                                 <select onChange={(e) => setAnswer(options[e.target.value])} required>
-                                    <option value="">Select the correct answer</option>
+                                    <option disabled selected>Select the correct answer</option>
                                     <option value="A">A</option>
                                     <option value="B">B</option>
                                     <option value="C">C</option>
@@ -200,11 +211,11 @@ function AdminQuestion2() {
                         </>
                     )}
                     <div>
-                        <label>Category:</label>
+                        <label>Course:</label>
                        
                             <div>
-                                <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-                                    <option value="">Select the category</option>
+                                <select onChange={(e) => setCategory(e.target.value)} required>
+                                    <option selected disabled>Select Course</option>
                                     {subCourse.map((data, index) => (
                                         <option key={index} value={data}>{data}</option>
                                     ))}
@@ -214,15 +225,33 @@ function AdminQuestion2() {
                     </div>
                     <button type="submit">Add Question</button>
                 </form>
-
+                </>
+                    :
+                <>
                 <h3 className='my-4'>Bulk Upload Questions</h3>
                 <form onSubmit={handleBulkUpload}>
+                <div>
+                        <label>Course:</label>
+                       
+                            <div>
+                                <select onChange={(e) => setCategory(e.target.value)} required>
+                                    <option selected disabled>Select Course</option>
+                                    {subCourse.map((data, index) => (
+                                        <option key={index} value={data}>{data}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        
+                    </div>
                     <div>
+
                         <label>Upload Excel/CSV File:</label>
                         <input type="file" accept=".csv, .xlsx" onChange={handleFileChange} />
                     </div>
                     <button type="submit">Upload Questions</button>
                 </form>
+                </>
+}
             </div>
         </>
     );

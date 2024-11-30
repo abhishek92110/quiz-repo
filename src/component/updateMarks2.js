@@ -21,7 +21,7 @@ const UpdateMarks = () => {
     try{
       
     setLoadingStatus(true)
-    let saveQuestion = await fetch("https://blockey.in:8000/update-save-quiz-question", {
+    let saveQuestion = await fetch("http://localhost:8000/update-save-quiz-question", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -72,7 +72,7 @@ const UpdateMarks = () => {
   const getUserAnswer = async () => {
 
     let response = await fetch(
-      "https://blockey.in:8000/get-save-quiz-question-admin",
+      "http://localhost:8000/get-save-quiz-question-admin",
       {
         method: "GET",
         headers: {

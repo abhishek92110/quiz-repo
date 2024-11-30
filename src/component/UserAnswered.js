@@ -32,7 +32,7 @@ const UserAnswered = () => {
 
     const getUnAnswerUser = async()=>{
       setLoadingStatus(true)
-        let data = await fetch("https://blockey.in:8000/get-user-saved-answer", {
+        let data = await fetch("http://localhost:8000/get-user-saved-answer", {
             method: 'GET',
             headers: {
               "Content-Type": "application/json",
@@ -60,7 +60,7 @@ const handleShow = (data)=>{
 
 }
 
-  return (
+return (
 
     <>
 
@@ -92,7 +92,8 @@ const handleShow = (data)=>{
   <tbody>
 
 {
-    UserAnswer.length>0 && UserAnswer.map((data,index)=>{
+    UserAnswer.length>0 && UserAnswer.map((data,index)=>
+      {
 
         return(
             <tr>
@@ -103,7 +104,8 @@ const handleShow = (data)=>{
                 <td className='pointer' onClick={()=>handleShow(data)}>{answerStatus==false?<i class="fa-regular fa-eye"></i>:<i class="fa-solid fa-square-poll-horizontal"></i>}</td>
             </tr>
         )
-    })
+    }
+    )
 }
    
   </tbody>

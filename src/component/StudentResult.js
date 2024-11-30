@@ -50,7 +50,7 @@ function StudentResult() {
 
     try {
         let response = await fetch(
-            "https://blockey.in:8000/get-save-quiz-question-admin",
+            "http://localhost:8000/get-save-quiz-question-admin",
             {
               method: "GET",
               headers: {

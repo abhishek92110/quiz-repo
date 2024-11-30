@@ -86,7 +86,7 @@ function App() {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await fetch("https://blockey.in:8000/add-user", {
+      const response = await fetch("http://localhost:8000/add-user", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +154,7 @@ function App() {
       console.log("google user data =",googleUserData)
 
       // Send data to your API
-      // const response = await fetch("https://blockey.in:8000/add-user", {
+      // const response = await fetch("http://localhost:8000/add-user", {
       //   method: 'POST',
       //   headers: {
       //     "Content-Type": "application/json",

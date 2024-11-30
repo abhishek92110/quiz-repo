@@ -36,7 +36,7 @@ function AdminQuestion()
         }
 
         try {
-            const response = await fetch('https://blockey.in:8000/add-question', {
+            const response = await fetch('http://localhost:8000/add-question', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
