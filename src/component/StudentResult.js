@@ -38,15 +38,11 @@ function StudentResult() {
     console.log("get sub course")
     let data = await contextValue.getAllCourse();
   
-    console.log("data of sub course of result=",data.subCourse)
-  
     setSubCourse(data.subCourse)
   }
 
   const fetchQuizData = async () => {
-    console.log("Selected category:", category);
-
-    setLoadingStatus(true);
+        setLoadingStatus(true);
 
     try {
         let response = await fetch(
@@ -55,7 +51,7 @@ function StudentResult() {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                category: localStorage.getItem("category"),
+                category: localStorage.getItem("userCourse"),
                 id: localStorage.getItem("userId"),
               },
             }
@@ -85,19 +81,38 @@ function StudentResult() {
   };
 
   const updatemarks = (data) => {
-    console.log("Update marks:", data, data.question.length);
+
     const totalQuestions = data.question.length;
     const correctAnswers = data.question.filter((q) => q.points === 1).length;
     const incorrectAnswers = totalQuestions - correctAnswers;
-    const percentage = ((data.marks / totalQuestions) * 100).toFixed(2);
-    const grade = percentage >= 60 ? "Pass" : "F";
+    const percentage = parseInt(((data.marks / totalQuestions) * 100).toFixed(2));
+    console.log("Update marks func:", data, data.question.length,percentage);
+
+    if(percentage>80){
+
+      setGrade("A")
+
+    }
+    else if(percentage>70 && percentage<80){
+      setGrade("B")
+    }
+    else if(percentage>60 && percentage<70){
+      setGrade("C")
+    }
+    else if(percentage>=50 && percentage<60){
+      console.log("else if percentage > 50")
+      setGrade("C")
+    }
+    else{
+      setGrade("F")
+    }
 
     setMarks(data.marks);
     setTotalQuestions(totalQuestions);
     setCorrectAnswers(correctAnswers);
     setIncorrectAnswers(incorrectAnswers);
     setPercentage(percentage);
-    setGrade(grade);
+    // setGrade(grade);
   };
 
   // Generate PDF
@@ -109,7 +124,7 @@ function StudentResult() {
     const correctAnswers = question.filter((q) => q.points === 1).length;
     const incorrectAnswers = totalQuestions - correctAnswers;
     const percentage = ((marks / totalQuestions) * 100).toFixed(2);
-    const grade = percentage >= 60 ? "Pass" : "F";
+    // const grade = percentage >= 60 ? "Pass" : "F";
 
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -117,6 +132,7 @@ function StudentResult() {
 
     // Add stats
     doc.setFontSize(12);
+    doc.text(`Name: ${name}`, 20, 30);
     doc.text(`Grade: ${grade}`, 20, 40);
     doc.text(`Total Questions: ${totalQuestions}`, 20, 50);
     doc.text(`Correct Answers: ${correctAnswers}`, 20, 60);
@@ -183,7 +199,6 @@ function StudentResult() {
             >
               <option selected disabled>--- Select Category ---</option>
               {subCourse.length > 0 && subCourse.map((data, index) => {
-                {console.log("sub course design map =",data)}
                 return (
                   <option key={index} value={data}>{data}</option>
                 );

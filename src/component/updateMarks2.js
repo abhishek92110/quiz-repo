@@ -77,7 +77,7 @@ const UpdateMarks = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          category: localStorage.getItem("category"),
+          category: localStorage.getItem("userCourse"),
           id: localStorage.getItem("userId"),
         },
       }

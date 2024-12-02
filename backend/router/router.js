@@ -23,23 +23,28 @@ router.get('/', async (req, res) => {
 
 
 router.post('/upload-questions', upload.single('file'), async (req, res) => {
-    const course = req.header("course")
-    console.log("Bulk question upload running", course);
+    const date   =  req.header("examDate")
+    const course =  req.header("course")
+    console.log("Bulk question upload running", course,date,req.header("examDate"));
 
     try {
         const filePath = req.file.path;
         let questions = [];
 
         // Process CSV or Excel file based on MIME type
-        if (req.file.mimetype === 'text/csv') {
+        if (req.file.mimetype === 'text/csv') 
+            {
             const csvData = fs.readFileSync(filePath, 'utf8');
             const parsedData = Papa.parse(csvData, { header: true });
             questions = parsedData.data;
-        } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+        } 
+        else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') 
+            {
             const workbook = xlsx.readFile(filePath);
             const sheetName = workbook.SheetNames[0];
             questions = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-        } else {
+        } 
+        else {
             return res.status(400).json({ status: false, message: 'Unsupported file format' });
         }
 
@@ -54,6 +59,8 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
                 const { question: ques, option1, option2, option3, option4, answer, type } = question;
                 let category = course
 
+                
+
                 console.log("course in upload question = ",course)
 
                 // Create a new question object
@@ -66,25 +73,32 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
                     option4,
                     answer,
                     type,
-                    category:course
+                    category:course,
+                    date:date,
+                    status:"Active"
                     
                 });
 
-                console.log("new Question =",newQuestion)
+                // console.log("new Question =",newQuestion)
 
                 // Save the question to the database
                 const savedQuestion = await newQuestion.save();
 
                 // Check if category exists and update total question count
                 const categoryDb = await categories.find({ category });
+
                 if (categoryDb.length > 0) {
                     const totalQuestion = parseInt(categoryDb[0].totalQuestion) + 1;
                     await categories.updateOne({ category }, { $set: { totalQuestion } });
-                } else {
+                } 
+
+                else {
+
                     const newCategory = new categories({
                         category,
                         totalQuestion: 1
                     });
+
                     await newCategory.save();
                 }
 
@@ -108,6 +122,71 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
         res.status(500).json({ status: false, message: 'Server error' });
     }
 });
+
+// route to get course and date wise question 
+
+// router.get("/get-course-date-exam",async(req,res)=>{
+  
+//     const course = req.header("course")
+//     const date = req.header("examDate")
+
+//     console.log("exam and date =",course,date)
+
+//     let getExam;
+
+//     if(course=="all"){
+
+//         getExam = await questiondb.find({date:date})
+//     }
+
+//     else{
+//         getExam = await questiondb.find({category:course, date:date})
+//     }
+//     res.send({status:true, length:getExam.length,data:getExam})
+
+    
+    
+// })
+
+router.get("/get-course-date-exam", async (req, res) => {
+    try {
+        const course = req.header("course"); // "all" or specific course
+        const date = req.header("examDate"); // Selected date
+
+        console.log("Exam and date =", course, date);
+
+        let getExam;
+
+        // Fetch all documents based on course and date
+        if (course === "all") {
+            getExam = await questiondb.find({ date });
+        } else {
+            getExam = await questiondb.find({ category: course, date });
+        }
+
+        // Group questions by course
+        const groupedQuestions = getExam.reduce((acc, item) => {
+            const courseName = item.category;
+
+            if (!acc[courseName]) 
+                {
+                console.log("course name object =",courseName)
+
+                acc[courseName] = [];
+
+            }
+
+            acc[courseName].push(item);
+            return acc;
+        }, {});
+
+        res.send({ status: true, length:groupedQuestions.length, groupedQuestions  });
+    } catch (error) {
+        console.error("Error fetching questions:", error);
+        res.status(500).send({ status: false, message: "Server error" });
+    }
+});
+
 
 
 router.post('/add-question', async (req, res) => {

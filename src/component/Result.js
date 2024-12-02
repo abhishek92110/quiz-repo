@@ -98,15 +98,33 @@ const getSubCourse = async()=>{
     const totalQuestions = data.question.length;
     const correctAnswers = data.question.filter((q) => q.points === 1).length;
     const incorrectAnswers = totalQuestions - correctAnswers;
-    const percentage = ((data.marks / totalQuestions) * 100).toFixed(2);
-    const grade = percentage >= 60 ? "Pass" : "F";
+    const percentage = parseInt(((data.marks / totalQuestions) * 100).toFixed(2));
+
+    if(percentage>80){
+
+      setGrade("A")
+
+    }
+
+    else if(percentage>70 && percentage<80){
+      setGrade("B")
+    }
+    else if(percentage>60 && percentage<70){
+      setGrade("C")
+    }
+    else if(percentage>=50 && percentage<60){
+      console.log("percentage = D")
+      setGrade("D")
+    }
+    else{
+      setGrade("F")
+    }
 
     setMarks(data.marks);
     setTotalQuestions(totalQuestions);
     setCorrectAnswers(correctAnswers);
     setIncorrectAnswers(incorrectAnswers);
     setPercentage(percentage);
-    setGrade(grade);
   };
 
   // Generate PDF
@@ -118,11 +136,13 @@ const getSubCourse = async()=>{
     const correctAnswers = question.filter((q) => q.points === 1).length;
     const incorrectAnswers = totalQuestions - correctAnswers;
     const percentage = ((marks / totalQuestions) * 100).toFixed(2);
-    const grade = percentage >= 60 ? "Pass" : "F";
+    // const grade = grade;
 
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("Quiz Results", 20, 20);
+
+    console.log("quiz result pdf =",grade)
 
     // Add stats
     doc.setFontSize(12);

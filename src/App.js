@@ -15,6 +15,7 @@ import { AppProvider } from './component/context/AppContext';
 import AdminQuestion2 from './component/AdminQuestion2';
 import Adminlogin from './component/Adminlogin';
 import StudentResult from './component/StudentResult';
+import Exam from './component/Exam';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
  <Route path="/admin-login" element={<Adminlogin /> }/>
  {/* <Route path="/admin-question2" element={<AdminQuestion /> }/> */}
  <Route path="/admin-question" element={<AdminQuestion2 /> }/>
+ <Route path="/exam-details" element={<Exam /> }/>
     </Routes>
   
   </BrowserRouter>

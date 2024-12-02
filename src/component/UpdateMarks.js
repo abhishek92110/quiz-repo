@@ -1,178 +1,3 @@
-// import React, { useEffect, useState, useRef } from "react";
-// import { useNavigate } from 'react-router-dom';
-// import Loading from "./Loading";
-// import Nav from "./Nav";
-// import jsPDF from "jspdf"; // Import jsPDF library
-
-// const UpdateMarks = () => {
-//   const [userAnswer, setUserAnswer] = useState([]);
-//   const [name, setName] = useState();
-//   const [category, setCategory] = useState()
-//   const [totalMarks, setTotalMarks] = useState(0);
-//   const [loadingStatus, setLoadingStatus] = useState(false);
-//   const questionRefs = useRef([]); // Ref array to track questions
-
-//   const navigate = useNavigate(); // React Router navigation
-
-//   useEffect(() => {
-//     getUserAnswer();
-//   }, []);
-
-//   const submitMarks = async () => {
-//     try {
-//       setLoadingStatus(true);
-//       let saveQuestion = await fetch("http://localhost:8000/update-save-quiz-question", {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//           token: localStorage.getItem("token"),
-//         },
-//         body: JSON.stringify({
-//           question: userAnswer,
-//           category: localStorage.getItem("category"),
-//           id: localStorage.getItem("userId"),
-//           marks: totalMarks,
-//         }),
-//       });
-
-//       saveQuestion = await saveQuestion.json();
-//       if (saveQuestion.status) {
-//         setTimeout(() => {
-//           setLoadingStatus(false);
-//           navigate('/student-answer');
-//         }, 2000);
-//       }
-//     } catch (error) {
-//       setLoadingStatus(false);
-//     }
-//   };
-
-//   const handleUpdate = (value, index, correctAnswer) => {
-//     const tempUserAnswer = [...userAnswer]; // Create a new copy of the array
-//     tempUserAnswer[index].points = value;
-//     tempUserAnswer[index].correctAnswer = correctAnswer; // Add the correct answer to the question
-
-//     let tempMarks = 0;
-//     tempUserAnswer.forEach((data) => {
-//       tempMarks = tempMarks + data.points;
-//     });
-
-//     setTotalMarks(tempMarks);
-//     setUserAnswer(tempUserAnswer);
-//   };
-
-//   const getUserAnswer = async () => {
-//     let response = await fetch(
-//       "http://localhost:8000/get-save-quiz-question-admin",
-//       {
-//         method: "GET",
-//         headers: {
-//           "Content-Type": "application/json",
-//           category: localStorage.getItem("category"),
-//           id: localStorage.getItem("userId"),
-//         },
-//       }
-//     );
-
-//     response = await response.json();
-//     setTotalMarks(response.userAnswer[0].marks);
-//     setUserAnswer(response.userAnswer[0].question);
-//     setName(response.userAnswer[0].username)
-//     setCategory(response.userAnswer[0].category)
-//   };
-
-//   const scrollToPending = () => {
-//     const pendingIndex = userAnswer.findIndex((answer) => answer.points === "Pending");
-//     if (pendingIndex !== -1 && questionRefs.current[pendingIndex]) {
-//       questionRefs.current[pendingIndex].scrollIntoView({
-//         behavior: "smooth",
-//         block: "center",
-//       });
-//     }
-//   };
- 
-//   return (
-//     <>
-//       <Nav />
-//       <div className="container">
-//         <div className="fixed-header">
-//           <div className="marks-section my-4">
-//             <strong>Marks : </strong>
-//             <span>{totalMarks}</span>
-//           </div>
-//           {loadingStatus && <Loading />}
-//           <button className="btn btn-primary" onClick={scrollToPending}>
-//             Pending
-//           </button>
-//         </div>
-//         <div className={`container ${loadingStatus && "overlay"}`}>
-//           {userAnswer &&
-//             userAnswer.map((data, index) => {
-//               return data.type === "subjective" ? (
-//                 <div
-//                   className="subjective-card bg-cover-color card my-2"
-//                   key={index}
-//                   ref={(el) => (questionRefs.current[index] = el)}
-//                 >
-//                   <div className="card-body">
-//                     <h5 className="card-title">Question {index + 1}</h5>
-//                     <div className="question-points-section">
-//                       <div>
-//                         <strong>Question : </strong>
-//                         <span className="card-text">{data.question}</span>
-//                       </div>
-//                       <div className="my-4">
-//                         <strong>Point</strong>
-//                         <strong className="mx-2">:</strong>
-//                         <span>{data.points}</span>
-//                       </div>
-//                     </div>
-//                     <strong>Given Answer : </strong>
-//                     <span>{data.yourAnswer}</span>
-//                   </div>
-//                 </div>
-//               ) : (
-//                 <div
-//                   className="objective-card  card my-4"
-//                   key={index}
-//                   ref={(el) => (questionRefs.current[index] = el)}
-//                 >
-//                   <div className="card-body">
-//                     <h5 className="card-title">Question {index + 1}</h5>
-//                     <div className="question-points-section">
-//                       <div>
-//                         <strong>Question : </strong>
-//                         <span className="card-text">{data.question}</span>
-//                       </div>
-//                       <div className="my-4">
-//                         <strong>Point</strong>
-//                         <strong className="mx-2">:</strong>
-//                         <span>{data.points}</span>
-//                       </div>
-//                     </div>
-//                     <div>
-//                       <strong>Given Answer : </strong>
-//                       <span>{data.yourAnswer}</span>
-//                     </div>
-//                   </div>
-//                 </div>
-//               );
-//             })}
-//           <div className="c-center my-4">
-//             <button className="btn btn-warning" onClick={submitMarks}>
-//               Submit
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default UpdateMarks;
-
-
-
 
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -188,7 +13,7 @@ const UpdateMarks = () => {
   const navigate = useNavigate(); // React Router navigation
 
   useEffect(() => {
-    console.log("user answer");
+    console.log("user answer getAnswer");
     getUserAnswer();
   }, []);
 
@@ -227,24 +52,57 @@ const UpdateMarks = () => {
   }
   };
 
+  // const handleUpdate = (value, index, correctAnswer) => {
+  //   const tempUserAnswer = [...userAnswer]; // Create a new copy of the array
+  //   tempUserAnswer[index].points = value;
+  //   tempUserAnswer[index].correctAnswer = correctAnswer; // Add the correct answer to the question
+
+  //   let tempMarks = 0;
+  //   tempUserAnswer.forEach((data) => {
+  //     tempMarks = tempMarks + data.points;
+  //   });
+
+  //   setTotalMarks(tempMarks);
+  //   // Update the specific index
+  //   setUserAnswer(tempUserAnswer);
+
+  //   console.log("handle update function", value, index, tempUserAnswer);
+  // };
+
+
   const handleUpdate = (value, index, correctAnswer) => {
     const tempUserAnswer = [...userAnswer]; // Create a new copy of the array
+    
+    // Retrieve the previous points for the question
+    const previousPoints = tempUserAnswer[index].points;
+    
+    // Update points based on the admin's action
     tempUserAnswer[index].points = value;
-    tempUserAnswer[index].correctAnswer = correctAnswer; // Add the correct answer to the question
+    tempUserAnswer[index].correctAnswer = correctAnswer; // Update the correct answer
+    
+    console.log("handle update func =",value, index, correctAnswer,previousPoints)
+    // Calculate total marks
 
-    let tempMarks = 0;
-    tempUserAnswer.forEach((data) => {
-      tempMarks = tempMarks + data.points;
-    });
+    let tempMarks = totalMarks;
 
-    setTotalMarks(tempMarks);
-    // Update the specific index
-    setUserAnswer(tempUserAnswer);
+    if (previousPoints == 1 && value == 0) {
+      // Deduct one point if previously marked correct and now marked incorrect
+      tempMarks = parseInt(tempMarks) - 1;
+    } else if ((previousPoints == "Pending" || previousPoints == 0) && value == 1) {
+      // Add one point if previously marked incorrect and now marked correct
 
-    console.log("handle update function", value, index, tempUserAnswer);
+      tempMarks = parseInt(tempMarks)+1;
+    }
+  
+    setTotalMarks(tempMarks); // Update total marks
+    setUserAnswer(tempUserAnswer); // Update the specific index
+  
+    console.log("Updated marks:", tempMarks, "Updated user answers:", tempUserAnswer);
   };
-
+  
   const getUserAnswer = async () => {
+
+    console.log("user Course get Answer = ",localStorage.getItem("userCourse"))
 
     let response = await fetch(
       "http://localhost:8000/get-save-quiz-question-admin",
@@ -252,7 +110,7 @@ const UpdateMarks = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          category: localStorage.getItem("category"),
+          category: localStorage.getItem("userCourse"),
           id: localStorage.getItem("userId"),
         },
       }
@@ -321,22 +179,22 @@ const UpdateMarks = () => {
 
                   <div className="btn-point-section">
                     <div className="btn-container">
-                      <button
-                        className="btn btn-success"
-                        onClick={() => {
-                          handleUpdate(1, index, data.correctAnswer);
-                        }}
-                      >
-                        Correct
-                      </button>
-                      <button
-                        className="btn btn-danger mx-2"
-                        onClick={() => {
-                          handleUpdate(0, index, data.correctAnswer);
-                        }}
-                      >
-                        Incorrect
-                      </button>
+                    <button
+  className="btn btn-success"
+  onClick={() => {
+    handleUpdate(1, index, data.correctAnswer);
+  }}
+>
+  Correct
+</button>
+<button
+  className="btn btn-danger mx-2"
+  onClick={() => {
+    handleUpdate(0, index, data.correctAnswer);
+  }}
+>
+  Incorrect
+</button>
                     </div>
 
                    

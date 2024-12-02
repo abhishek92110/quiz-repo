@@ -12,6 +12,7 @@ const userQuizSchema = new mongoose.Schema({
   },
   username:{type: String},
   useremail:{type: String},
+  // date:{type: String},
   date: { 
     type: Date, 
     default: Date.now // Automatically sets the current date when the document is created

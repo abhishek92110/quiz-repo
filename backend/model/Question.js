@@ -8,7 +8,9 @@ const questionSchema = new mongoose.Schema({
   option4: { type: String },
   answer: { type: String },
   type: { type: String },
-  category: { type: String }
+  category: { type: String },
+  status: { type: String },
+  date:{type:String}
 });
 
 module.exports = mongoose.model('questions', questionSchema);

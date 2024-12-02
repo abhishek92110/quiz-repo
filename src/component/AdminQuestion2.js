@@ -18,6 +18,7 @@ function AdminQuestion2() {
     const [subCourse, setSubCourse] = useState([]);
     const [loadingStatus, setLoadingStatus] = useState(false);
     const [questionStatus, setQuestionStatus] = useState("single")
+    const [date, setDate] = useState('');
 
     const navigate = useNavigate();
 
@@ -62,12 +63,14 @@ function AdminQuestion2() {
 
         const formData = new FormData();
         formData.append('file', file);
+        console.log("upload question route =",date)
 
         try {
             let response = await fetch('http://localhost:8000/upload-questions', {
                 method: 'POST',
                 headers:{
 
+                    examDate:date,
                     course:category,
                 },
 
@@ -109,6 +112,7 @@ function AdminQuestion2() {
             option2:options.B,
             option3:options.C,
             option4:options.D,
+            date:date,
             answer,
         };
 
@@ -146,8 +150,8 @@ function AdminQuestion2() {
             <Nav />
             {loadingStatus && <Loading/>}
             <div className="admin-form">
-                <button onClick={()=>setQuestionStatus("single")} className='mx-4'>Single</button>
-                <button onClick={()=>setQuestionStatus("bulk")}>Bulk</button>
+                <button onClick={()=>setQuestionStatus("single")}>Single</button>
+                <button onClick={()=>setQuestionStatus("bulk")} className='mx-4'>Bulk</button>
                 {
                     questionStatus=="single" ?
                     <>
@@ -221,6 +225,16 @@ function AdminQuestion2() {
                                     ))}
                                 </select>
                             </div>
+
+                            <div>
+    <label>Date:</label>
+    <input
+        type="date"
+        value={date}
+        onChange={(e) => {setDate(e.target.value);console.log("set date =",e.target.value)}}
+        required
+    />
+</div>
                         
                     </div>
                     <button type="submit">Add Question</button>
@@ -243,6 +257,16 @@ function AdminQuestion2() {
                             </div>
                         
                     </div>
+
+                    <div>
+    <label>Date:</label>
+    <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        required
+    />
+</div>
                     <div>
 
                         <label>Upload Excel/CSV File:</label>

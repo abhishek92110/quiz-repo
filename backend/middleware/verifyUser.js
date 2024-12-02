@@ -24,7 +24,8 @@ const verifyUserToken = async(req, res, next) => {
 
         req.message=''
 
-        const userData = await user.find({email:decoded.email})
+        const userData = await user.find({email:decoded.userEmail})
+        console.log("userData =",userData, decoded.userEmail)
 
         if(userData.length>0){
 

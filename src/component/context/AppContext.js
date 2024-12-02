@@ -80,9 +80,32 @@ export const AppProvider = ({ children }) => {
 
   }
 
+  const getExam = async(course, date)=>{
+
+    try{
+
+    let examDetails = await fetch("http://localhost:8000/get-course-date-exam", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "course":course,
+        "examDate":date
+      },
+    });
+
+    examDetails = await examDetails.json()
+
+    return examDetails
+  }
+  catch(error){
+    return {status:false}
+  }
+
+  }
+
 
   return (
-    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin, verifyUser, getAllCourse, getSubCourse }}>
+    <AppContext.Provider value={{ loggedInStatus, updateLoggedinStatus, verifyAdmin, verifyUser, getAllCourse, getSubCourse,getExam }}>
       {children}
     </AppContext.Provider>
   );

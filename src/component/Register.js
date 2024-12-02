@@ -56,6 +56,7 @@ function App() {
   const verifyUser = async()=>{
    
     const response = await contextValue.verifyUser()
+    console.log("response verify user =",response)
 
     if((response.status)){
         navigate('/select-quiz')
