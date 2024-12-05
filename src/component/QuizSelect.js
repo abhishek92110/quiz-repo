@@ -24,43 +24,77 @@ const QuizHomePage = () => {
   }, []);
 
 
-  const getActiveQuiz = async(subCourseData)=>{
+  // const getActiveQuiz = async(subCourseData)=>{
 
-    console.log("get active quiz api")
+  //   console.log("get active quiz api")
 
 
-    let response = await fetch('https://blockey.in:8000/active-quiz ', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        mainCourse: localStorage.getItem('userCourse'),
-        examDate:   localStorage.getItem('date')
-      },
-    });
+  //   let response = await fetch('https://blockey.in:8000/active-quiz ', {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       mainCourse: localStorage.getItem('userCourse'),
+  //       examDate:   localStorage.getItem('date')
+  //     },
+  //   });
 
-    response = await response.json()
+  //   response = await response.json()
 
-    console.log("active quiz response =",response,subCourse)
+  //   console.log("active quiz response =",response,subCourse)
 
-    let tempSubCourse = subCourseData
+  //   let tempSubCourse = subCourseData
 
-    subCourseData.map((data,index)=>{
-      let activeCourse = response.activeSubCourse.find((element)=>{
-        return data.course==element
-      })
-      console.log("data active quiz filter =",activeCourse)
+  //   subCourseData.map((data,index)=>{
+  //     let activeCourse = response.activeSubCourse.find((element)=>{
+  //       return data.course==element
+  //     })
+  //     console.log("data active quiz filter =",activeCourse)
 
-      if(activeCourse){
-        console.log("if active course")
-        tempSubCourse[index].status=true
+  //     if(activeCourse){
+  //       console.log("if active course")
+  //       tempSubCourse[index].status=true
+  //     }
+  //   })
+
+  //   console.log("temp sub course =",tempSubCourse)
+  //   setSubCourse(tempSubCourse)
+
+  // }
+
+
+  const getActiveQuiz = async (subCourseData) => {
+    try {
+      console.log("Fetching active quiz...");
+  
+      const response = await fetch('https://blockey.in:8000/active-quiz', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          mainCourse: localStorage.getItem('userCourse'),
+          examDate: localStorage.getItem('date'),
+        },
+      });
+  
+      const result = await response.json();
+      console.log("Active quiz response:", result);
+  
+      if (!result.activeSubCourse) {
+        console.error("Invalid response structure:", result);
+        return;
       }
-    })
-
-    console.log("temp sub course =",tempSubCourse)
-    setSubCourse(tempSubCourse)
-
-  }
-
+  
+      const updatedSubCourse = subCourseData.map((data) => {
+        const isActive = result.activeSubCourse.includes(data.course);
+        return { ...data, status: isActive };
+      });
+  
+      console.log("Updated subCourse data:", updatedSubCourse);
+      setSubCourse(updatedSubCourse);
+    } catch (error) {
+      console.error("Error fetching active quiz:", error);
+    }
+  };
+  
   
 
   const verifyUser = async()=>{
