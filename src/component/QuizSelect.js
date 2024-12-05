@@ -11,6 +11,7 @@ const QuizHomePage = () => {
   const [selectCategory, setCategory] = useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [animate, setAnimate] = useState(false); // New state for animation
+  const [courseStatus, setCourseStatus] = useState(false)
 
   const navigate = useNavigate();
 
@@ -18,7 +19,49 @@ const QuizHomePage = () => {
     setAnimate(true); // Trigger animation on component mount
     getSubCourse();
     verifyUser();
+    setDate()
+    // getActiveQuiz();
   }, []);
+
+
+  const getActiveQuiz = async(subCourseData)=>{
+
+    console.log("get active quiz api")
+
+
+    let response = await fetch('https://blockey.in:8000/active-quiz ', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        mainCourse: localStorage.getItem('userCourse'),
+        examDate:   localStorage.getItem('date')
+      },
+    });
+
+    response = await response.json()
+
+    console.log("active quiz response =",response,subCourse)
+
+    let tempSubCourse = subCourseData
+
+    subCourseData.map((data,index)=>{
+      let activeCourse = response.activeSubCourse.find((element)=>{
+        return data.course==element
+      })
+      console.log("data active quiz filter =",activeCourse)
+
+      if(activeCourse){
+        console.log("if active course")
+        tempSubCourse[index].status=true
+      }
+    })
+
+    console.log("temp sub course =",tempSubCourse)
+    setSubCourse(tempSubCourse)
+
+  }
+
+  
 
   const verifyUser = async()=>{
    
@@ -28,6 +71,21 @@ const QuizHomePage = () => {
           navigate('/register')
       }
   }
+
+  const setDate=()=>{
+
+    console.log("set date =")
+
+    let date = new Date()
+    let year = date.getFullYear();
+    let month = (date.getMonth()+1).toString().padStart(2,'0')
+    let day  = date.getDate().toString().padStart(2,0)
+
+     let fullDate = `${year}-${month}-${day}`
+
+     localStorage.setItem("date",fullDate)
+  }
+ 
   
 
   const getSubCourse = async()=>{
@@ -36,6 +94,7 @@ const QuizHomePage = () => {
     console.log("data of sub course =",data.subCourse[0].subCourse)
 
     setSubCourse(data.subCourse[0].subCourse)
+    getActiveQuiz(data.subCourse[0].subCourse)
   }
 
   const handlePlay = () => {
@@ -68,23 +127,25 @@ const QuizHomePage = () => {
                 fitness with us today.
               </p>
             </div>
-            <button className="btn btn-warning" onClick={() => handlePlay()}>
+            <button className="btn btn-warning" disabled={!courseStatus} onClick={() => handlePlay()}>
               Start Quiz
             </button>
           </div>
 
           <section>
             <h3 className="text-2xl font-bold mb-6 my-4">Select a category</h3>
-            <div className="quiz-card">
+            <div className = "quiz-card">
               {subCourse.length > 0 && subCourse.map((data, index) => {
+                console.log("data status =",data.status)
                 return (
-                  <div className={`card ${selectCategory === data.course ? "bg-warning" : ""}`} 
+                  <div className={`card ${selectCategory === data.course ? "bg-warning" : ""} ${data.status!=true && "deactive"}`} 
                     style={{ "width": "18rem" }} 
                     key={index} 
-                    onClick={() => { 
+                    onClick={data.status ? () => { 
+                      setCourseStatus(true)
                       setCategory(data.course); 
                       localStorage.setItem("category", data.course); 
-                    }}>
+                    } : null}>
                     <div className="card-body">
                       <h5 className="card-title">{data.course}</h5>
                     </div>

@@ -21,7 +21,9 @@ const UpdateMarks = () => {
     try{
       
     setLoadingStatus(true)
-    let saveQuestion = await fetch("http://localhost:8000/update-save-quiz-question", {
+
+    console.log("update save question =",userAnswer, localStorage.getItem("userCourse"), totalMarks)
+    let saveQuestion = await fetch("https://blockey.in:8000/update-save-quiz-question", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +31,7 @@ const UpdateMarks = () => {
       },
       body: JSON.stringify({
         question: userAnswer,
-        category: localStorage.getItem("category"),
+        category: localStorage.getItem("userCourse"),
         id: localStorage.getItem("userId"),
         marks: totalMarks,
       }),
@@ -105,7 +107,7 @@ const UpdateMarks = () => {
     console.log("user Course get Answer = ",localStorage.getItem("userCourse"))
 
     let response = await fetch(
-      "http://localhost:8000/get-save-quiz-question-admin",
+      "https://blockey.in:8000/get-save-quiz-question-admin",
       {
         method: "GET",
         headers: {

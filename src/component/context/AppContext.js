@@ -13,7 +13,7 @@ export const AppProvider = ({ children }) => {
 
   const verifyAdmin = async()=>{
 
-    let response = await fetch("http://localhost:8000/verify-admin", {
+    let response = await fetch("https://blockey.in:8000/verify-admin", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export const AppProvider = ({ children }) => {
   }
   const verifyUser = async()=>{
 
-    let response = await fetch("http://localhost:8000/verify-user", {
+    let response = await fetch("https://blockey.in:8000/verify-user", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export const AppProvider = ({ children }) => {
 
   const getAllCourse = async()=>{
 
-    let allCourse = await fetch("http://localhost:8000/all-course", {
+    let allCourse = await fetch("https://blockey.in:8000/all-course", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const AppProvider = ({ children }) => {
 
     console.log("sub course useContext=",localStorage.getItem("userCourse"))
 
-    let subCourse = await fetch("http://localhost:8000/sub-course", {
+    let subCourse = await fetch("https://blockey.in:8000/sub-course", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -80,16 +80,17 @@ export const AppProvider = ({ children }) => {
 
   }
 
-  const getExam = async(course, date)=>{
+  const getExam = async(course, dateRange)=>{
 
     try{
 
-    let examDetails = await fetch("http://localhost:8000/get-course-date-exam", {
+    let examDetails = await fetch("https://blockey.in:8000/get-course-date-exam", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
         "course":course,
-        "examDate":date
+        "startDate":dateRange.startDate,
+        "endDate":dateRange.endDate
       },
     });
 

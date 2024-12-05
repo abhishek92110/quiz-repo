@@ -67,7 +67,7 @@ function Quiz() {
 
     setLoadingStatus(true)
 
-    let response = await fetch("http://localhost:8000/get-question", {
+    let response = await fetch("https://blockey.in:8000/get-question", {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -128,7 +128,7 @@ function Quiz() {
     }));
   
     // Save quiz data to backend
-    await fetch("http://localhost:8000/save-quiz-question", {
+    await fetch("https://blockey.in:8000/save-quiz-question", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

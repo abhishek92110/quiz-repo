@@ -14,9 +14,8 @@ const userQuizSchema = new mongoose.Schema({
   useremail:{type: String},
   // date:{type: String},
   date: { 
-    type: Date, 
-    default: Date.now // Automatically sets the current date when the document is created
-  }
+    type:String
+    }
 });
 
 module.exports = mongoose.model('userquizes', userQuizSchema);

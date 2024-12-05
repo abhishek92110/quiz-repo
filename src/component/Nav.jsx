@@ -7,7 +7,7 @@ const Nav = (props) => {
 
   const [loadingStatus, setLoadingStatus] = useState(false)
 
-  console.log("current location", window.location.pathname, props)
+  // console.log("current location", window.location.pathname, props)
 
   const navigate = useNavigate();
 

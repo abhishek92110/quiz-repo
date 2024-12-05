@@ -63,7 +63,7 @@ const getSubCourse = async()=>{
     setLoadingStatus(true);
 
     try {
-      const response = await fetch("http://localhost:8000/get-save-quiz-question", {
+      const response = await fetch("https://blockey.in:8000/get-save-quiz-question", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -324,6 +324,25 @@
   text-align: center;
 }
 
+.course-date-section{
+  display: flex;
+  align-items: center;
+  column-gap: 30px;
+}
+
+.deactive{
+  opacity: 0.5;
+  cursor: auto !important;
+}
+
+.start-end-section{
+  display: flex;
+}
+
+.deactive:hover{
+  background-color: white !important;
+}
+
 .pdf-button {
   padding: 10px 15px;
   background-color: #007bff;

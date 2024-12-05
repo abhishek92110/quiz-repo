@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading';
 import Nav from './Nav';
@@ -8,6 +8,14 @@ const QuizApp = () => {
 
   const navigate = useNavigate();
 
+
+  useEffect(()=>{
+
+    console.log("use effect running of select component")
+    setDate()
+
+  },[])
+
   const handlePlay = ()=>{
     setLoadingStatus(true)
     setTimeout(()=>{
@@ -15,6 +23,20 @@ const QuizApp = () => {
       navigate('/quiz')
     },2000)
 
+  }
+
+  const setDate=()=>{
+
+    console.log("set date =")
+
+    let date = new Date()
+    let year = date.getFullYear();
+    let month = (date.getMonth()+1).toString().padStart(2,'0')
+    let day  = date.getDate().toString().padStart(2,0)
+
+     let fullDate = `${year}-${month}-${day}`
+
+     localStorage.setItem("date",fullDate)
   }
  
   return (

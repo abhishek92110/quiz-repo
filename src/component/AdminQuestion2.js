@@ -66,7 +66,7 @@ function AdminQuestion2() {
         console.log("upload question route =",date)
 
         try {
-            let response = await fetch('http://localhost:8000/upload-questions', {
+            let response = await fetch('https://blockey.in:8000/upload-questions', {
                 method: 'POST',
                 headers:{
 
@@ -120,7 +120,7 @@ function AdminQuestion2() {
             // If a new category is being added, save it to the backend first.
            
             // Add the question
-            const response = await fetch('http://localhost:8000/add-question', {
+            const response = await fetch('https://blockey.in:8000/add-question', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

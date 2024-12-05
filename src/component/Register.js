@@ -45,11 +45,9 @@ function App() {
   });
 
   useEffect(()=>{
-
-    
+ 
     verifyUser()
     getAllCourse()
-
 
   },[])
 
@@ -87,7 +85,7 @@ function App() {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await fetch("http://localhost:8000/add-user", {
+      const response = await fetch("https://blockey.in:8000/add-user", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -155,7 +153,7 @@ function App() {
       console.log("google user data =",googleUserData)
 
       // Send data to your API
-      // const response = await fetch("http://localhost:8000/add-user", {
+      // const response = await fetch("https://blockey.in:8000/add-user", {
       //   method: 'POST',
       //   headers: {
       //     "Content-Type": "application/json",
@@ -245,6 +243,24 @@ function App() {
             />
           </div>
 
+          <div className="form-group">
+          <label htmlFor="course">Course</label>
+          
+          <select
+              className="custom-select"
+              name="course"
+              onChange={handleChange}
+              
+            >
+              <option selected disabled>--- Select Course ---</option>
+              {allCourse.length > 0 && allCourse.map((data, index) => {
+                return (
+                  <option key={index} value={data.mainCourse}>{data.mainCourse}</option>
+                );
+              })}
+            </select>
+        </div>
+
           <button type="submit" className="register-btn">Register</button>
         </form>
 
@@ -275,7 +291,7 @@ function App() {
               onChange={handleChange}
               
             >
-              <option selected disabled>--- Select Category ---</option>
+              <option selected disabled>--- Select Course ---</option>
               {allCourse.length > 0 && allCourse.map((data, index) => {
                 return (
                   <option key={index} value={data.mainCourse}>{data.mainCourse}</option>

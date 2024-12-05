@@ -64,17 +64,20 @@ function Quiz() {
   const getAllQuestion = async () => {
     setLoadingStatus(true);
 
-    let response = await fetch('http://localhost:8000/get-question', {
+    let response = await fetch('https://blockey.in:8000/get-question', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         category: localStorage.getItem('category'),
+        examDate:localStorage.getItem('date')
       },
     });
 
     response = await response.json();
+
+    console.log("response all question =",response)
     setLoadingStatus(false);
-    setAllQuestion(response.question);
+    setAllQuestion(response.question[0].questions);
   };
 
   const handleOptionSelect = (option) => {
@@ -91,6 +94,7 @@ function Quiz() {
   }, [currentQuestionIndex, allQuestion.length]);
 
   const handleForceSubmit = () => {
+
     setLoadingStatus(true);
 
     const question = allQuestion.map((q, index) => ({
@@ -111,7 +115,7 @@ function Quiz() {
           : 0,
     }));
 
-    fetch('http://localhost:8000/save-quiz-question', {
+    fetch('https://blockey.in:8000/save-quiz-question', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -121,6 +125,7 @@ function Quiz() {
         question,
         category: localStorage.getItem('category'),
         status: false,
+        date:localStorage.getItem("date"),
         marks: question.reduce((sum, q) => sum + (q.points === 1 ? 1 : 0), 0),
       }),
     });
@@ -168,7 +173,7 @@ function Quiz() {
           : 0,
     }));
 
-    await fetch('http://localhost:8000/save-quiz-question', {
+    await fetch('https://blockey.in:8000/save-quiz-question', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -177,7 +182,8 @@ function Quiz() {
       body: JSON.stringify({
         question,
         category: localStorage.getItem('category'),
-        status: true,
+        status: false,
+        date:localStorage.getItem("date"),
         marks: totalMarks,
       }),
     });

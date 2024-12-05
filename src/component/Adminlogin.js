@@ -54,7 +54,7 @@ function Adminlogin() {
     e.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await fetch("http://localhost:8000/admin-login", {
+      const response = await fetch("https://blockey.in:8000/admin-login", {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

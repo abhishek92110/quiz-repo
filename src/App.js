@@ -16,6 +16,7 @@ import AdminQuestion2 from './component/AdminQuestion2';
 import Adminlogin from './component/Adminlogin';
 import StudentResult from './component/StudentResult';
 import Exam from './component/Exam';
+import CustomDate from './component/CustomDate';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
  {/* <Route path="/select-quiz" element={<Select /> }/> */}
  <Route path="/select-quiz" element={<QuizSelect /> }/>
  <Route path="/quiz" element={<Quiz /> }/>
+ <Route path="/custom-date" element={<CustomDate /> }/>
  <Route path="/new-quiz" element={<NewQuiz /> }/>
  <Route path="/quiz-result" element={<Result /> }/>
  <Route path="/admin-login" element={<Adminlogin /> }/>

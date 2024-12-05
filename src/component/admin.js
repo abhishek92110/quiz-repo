@@ -33,6 +33,7 @@ function Admin() {
         <div className="home-btn-container">
             <button class="btn" onClick={()=>{navigate('/admin-question')}}>Add Question</button>
             <button class="btn" onClick={()=>{navigate('/student-answer')}}>Student Answer</button>
+            <button class="btn" onClick={()=>{navigate('/exam-details')}}>Exam</button>
         </div>
         </>
     );

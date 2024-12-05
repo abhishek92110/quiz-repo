@@ -1,50 +1,20 @@
-const express = require('express');
-const router = express.Router();
-const questiondb = require("../model/Question")
-const user = require("../model/User")
-const saveQuiz  = require("../model/SaveQuiz")
-const jwt = require('jsonwebtoken');
-const verifyUser = require("../middleware/verifyUser")
-const categories = require("../model/Category")
-const allCourse  = require("../model/AllCourse")
-const admin = require("../model/Admin")
-const multer = require('multer');
-const Papa = require('papaparse'); // For CSV parsing
-const xlsx = require('xlsx'); // For Excel parsing
-const fs = require('fs');
-const verifyAdmin = require('../middleware/verifyAdmin');
-const upload = multer({ dest: 'uploads/' });
-
-const jwt_secret = 'www'; 
-
-router.get('/', async (req, res) => {
-    res.send({ "status": "running" });
-});
-
-
+// start of route for quiz
 router.post('/upload-questions', upload.single('file'), async (req, res) => {
-    const date   =  req.header("examDate")
-    const course =  req.header("course")
-    console.log("Bulk question upload running", course,date,req.header("examDate"));
-
+    console.log("Bulk question upload running");
     try {
         const filePath = req.file.path;
         let questions = [];
 
         // Process CSV or Excel file based on MIME type
-        if (req.file.mimetype === 'text/csv') 
-            {
+        if (req.file.mimetype === 'text/csv') {
             const csvData = fs.readFileSync(filePath, 'utf8');
             const parsedData = Papa.parse(csvData, { header: true });
             questions = parsedData.data;
-        } 
-        else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') 
-            {
+        } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
             const workbook = xlsx.readFile(filePath);
             const sheetName = workbook.SheetNames[0];
             questions = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-        } 
-        else {
+        } else {
             return res.status(400).json({ status: false, message: 'Unsupported file format' });
         }
 
@@ -53,38 +23,44 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
         let addedCount = 0; // Track successfully added questions
         let failedCount = 0; // Track failed questions
 
-        let previousData = await questiondb.find({category:course, date:date})
-        console.log("previous data =",previousData)
+        for (const question of questions) {
+            try {
+                const { question: ques, option1, option2, option3, option4, answer, category, type } = question;
 
-        if(previousData.length>0){
+                // Create a new question object
+                const newQuestion = new questiondb({
+                    question: ques,
+                    option1,
+                    option2,
+                    option3,
+                    option4,
+                    answer,
+                    type,
+                    category
+                });
 
-            console.log("if condition")
+                // Save the question to the database
+                const savedQuestion = await newQuestion.save();
 
-            let oldQuestion = previousData[0].questions
+                // Check if category exists and update total question count
+                const categoryDb = await categories.find({ category });
+                if (categoryDb.length > 0) {
+                    const totalQuestion = parseInt(categoryDb[0].totalQuestion) + 1;
+                    await categories.updateOne({ category }, { $set: { totalQuestion } });
+                } else {
+                    const newCategory = new categories({
+                        category,
+                        totalQuestion: 1
+                    });
+                    await newCategory.save();
+                }
 
-            let newQuestion = [...oldQuestion, ...questions];
-
-            console.log("length of questions =",newQuestion.length,oldQuestion.length, questions.length,course,date);
-
-            await questiondb.updateOne({category:course, date:date},{$set:{questions:newQuestion}})
-
+                addedCount++;
+            } catch (error) {
+                console.error('Error processing question:', question, error);
+                failedCount++;
+            }
         }
-
-        else{
-
-            console.log("else condition")
-
-            const newQuestion = new questiondb({
-                questions:questions,
-                status:"Active",
-                category:course,
-                date
-            });
-
-            const savedQuestion = await newQuestion.save();
-
-        }
-
 
         res.status(201).json({
             status: true,
@@ -92,148 +68,53 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
             added: addedCount,
             failed: failedCount
         });
-    } 
-    catch (error) {
+    } catch (error) {
         console.error('Error during bulk upload:', error);
         res.status(500).json({ status: false, message: 'Server error' });
     }
 });
 
-// route to get course and date wise question 
-
-// router.get("/get-course-date-exam",async(req,res)=>{
-  
-//     const course = req.header("course")
-//     const date   = req.header("examDate")  
-
-//     console.log("exam and date =",course,date)
-
-//     let getExam;
-
-//     if(course=="all"){
-
-//         getExam = await questiondb.find({date:date})
-//     }
-
-//     else{
-//         getExam = await questiondb.find({category:course, date:date})
-//     }
-//     res.send({status:true, length:getExam.length,data:getExam})
-
-    
-    
-// })
-
-router.get("/get-course-date-exam", async (req, res) => 
-    {
-    try {
-        const course = req.header("course");
-        const startDate = req.header("startDate");
-        const endDate = req.header("endDate");
-
-        console.log("course =", course, "startDate =", startDate, "endDate =", endDate);
-
-        // Validate date inputs
-        if (!startDate || !endDate) {
-            return res.status(400).json({ status: false, error: "startDate and endDate are required." });
-        }
-
-        let getExam;
-
-        if (course === "all") {
-            // Fetch all exams within the date range
-            getExam = await questiondb.find({
-                date: { $gte: startDate, $lte: endDate }
-            });
-        } else {
-            // Fetch exams for a specific course within the date range
-            getExam = await questiondb.find({
-                category: course,
-                date: { $gte: startDate, $lte: endDate }
-            });
-        }
-
-        res.send({ status: true, length: getExam.length, data: getExam });
-
-    } 
-    catch (error) {
-        console.error("Error fetching exams:", error);
-        res.status(500).json({ status: false, error: "Server error" });
-    }
-});
-
-
-// update exam status route 
-
-router.put("/update-exam-status",async(req,res)=>{
-
-    console.log("update exam route is running =",req.body)
-  
-    try{
-    const data = req.body
-
-    await questiondb.updateOne({_id:data._id}, {$set:data})
-   
-    res.send({status:true})
-    }
-    catch(error){
-        console.log("error update exam ",error.message)
-        res.send({status:false})
-    }
-
-    
-    
-})
 
 router.post('/add-question', async (req, res) => {
     console.log("add question running")
     try {
         console.log("req body add-question =",req.body)
-        const { question, option1, option2, option3, option4, answer, category, type,date } = req.body;
-
-        let previousData = await questiondb.find({category:category, date:date})
-
-
-        if(previousData.length>0){
-            let newQuestion = previousData[0].questions
-            newQuestion.push(
-                {
-                    question,
-                    option1,
-                    option2,
-                    option3,
-                    option4,
-                    answer,
-                    type
-                }
-            )
-            await questiondb.updateOne({category:category, date:date},{$set:{questions:newQuestion}})
-        }
-        else{
+        const { question, option1, option2, option3, option4, answer, category, type } = req.body;
 
         // Create a new question
         const newQuestion = new questiondb({
-            questions:[{
-                question,
-                option1,
-                option2,
-                option3,
-                option4,
-                answer,
-                type
-            }],
-            status:"Active",
-            category,
-            date
+            question,
+            option1,
+            option2,
+            option3,
+            option4,
+            answer,
+            type,
+            category
         });
 
         // Save the question to the database
         const savedQuestion = await newQuestion.save();
-    }
+        const categoryDb = await categories.find({category:category});
+        if(categoryDb.length>0){
+            const totalQuestion = parseInt(categoryDb[0].totalQuestion) + 1
 
-        res.status(201).json({ "status":true,message: 'Question added successfully' });
-    } 
-    catch (error) {
+            await categories.updateOne({category:category}, {$set:{totalQuestion:totalQuestion}})
+        }
+        else{
+            
+            const newCategory = new categories({
+                category:category,
+                totalQuestion:1
+            });
+    
+            // Save the question to the database
+          await newCategory.save();
+
+        }
+
+        res.status(201).json({ "status":true,message: 'Question added successfully', question: savedQuestion });
+    } catch (error) {
         console.error('Error adding question:', error);
         res.status(500).json({"status":false, error: 'Server error' });
     }
@@ -243,10 +124,9 @@ router.post('/add-question', async (req, res) => {
 router.get('/get-question', async (req, res) => {
     try {
        const category = req.header("category")
-       const date = req.header("examDate")
-       console.log("category =",category,date)
+       console.log("category =",category)
 
-       const allQuestions  = await questiondb.find({category:category, date:date});
+       const allQuestions  = await questiondb.find({category:category});
         res.status(201).json({ status: true, question: allQuestions });
 
     } catch (error) {
@@ -341,6 +221,7 @@ router.get('/verify-user',verifyUser, async (req, res) => {
 
         // Check if a user with the same email already exists
        if(req.message){
+        console.log("verify user true")
         res.send({status:true})
        }
        else{
@@ -366,11 +247,12 @@ router.post('/save-quiz-question', verifyUser, async (req, res) => {
             user: req.userId, // Add the verified user ID
             username:req.userName,
             useremail:req.userEmail,
-            date:req.body.date
+            date:new Date()
         };
 
-        console.log("quiz data =",req.body,req.body.date)
+        console.log("quiz data =",quizData)
 
+      
         await saveQuiz.updateOne({user:req.userId, category:data.category},{$set:quizData},{upsert:true})
 
         res.status(201).json({ status: true });
@@ -380,32 +262,6 @@ router.post('/save-quiz-question', verifyUser, async (req, res) => {
         res.status(500).json({ status: false, error: 'Server error' });
     }
 });
-
-// router to get active quiz list of date
-
-router.get('/active-quiz',async(req,res)=>{
-    const mainCourse = req.header("mainCourse")
-    const date = req.header("examDate")
-
-
-    const subCourse  = await allCourse.find({mainCourse:mainCourse})
-    const activeQuiz = await questiondb.find({status:"Active",date:date})
-
-    const activeSubCourse = []
-
-    activeQuiz.map(data=>{
-
-        subCourse[0].subCourse.map(element=>{
-            if(data.category==element.course){
-                activeSubCourse.push(element.course)
-            }
-        })
-
-    })
-
-    res.send({status:true,activeSubCourse:activeSubCourse})
-
-})
 
 router.put('/update-save-quiz-question', async (req, res) => {
     try
@@ -469,76 +325,24 @@ router.get('/get-save-quiz-question-admin', async (req, res) =>
 
 // router to get user saved answer
 
-// router.get('/get-user-saved-answer', async (req, res) => {
-//     try
-//      {
-
-//         let status = req.header("status")
-//         let course = req.header('course')
-//         let date = req.header("examDate")
-
-//         // Include user ID from the middleware
-
-//         console.log("data get save user =",date,course,status)
-
-//         let userAnswer = []
-
-//         if(course =="all"){
-
-//             console.log("if condition = ",course)
-
-//             userAnswer = await saveQuiz.find({status:status, date:date})
-//         }
-
-//         else{
-
-//             userAnswer = await saveQuiz.find({status:status, date:date, category:course})
-
-//         }
-
-
-//         res.status(201).json({ status: true, userAnswer:userAnswer });
-//     } 
-//     catch (error) 
-//     {
-//         console.error('Error saving quiz question:', error);
-//         res.status(500).json({ status: false, error: 'Server error' });
-//     }
-// });
-
 router.get('/get-user-saved-answer', async (req, res) => {
-    try {
-        const status = req.header("status");
-        const course = req.header("course");
-        const startDate = req.header("startDate");
-        const endDate = req.header("endDate");
+    try
+     {
 
-        console.log("Received parameters =", { status, course, startDate, endDate });
+        let status = req.header("status")
 
-        let userAnswer = [];
+        // Include user ID from the middleware
 
-        if (course === "all") {
-            // console.log("Fetching for all courses");
-            userAnswer = await saveQuiz.find({
-                status: status,
-                date: { $gte: startDate, $lte: endDate }
-            });
-        } else {
-            // console.log(`Fetching for course: ${course}`);
-            userAnswer = await saveQuiz.find({
-                status: status,
-                date: { $gte: startDate, $lte: endDate },
-                category: course
-            });
-        }
+        const userAnswer = await saveQuiz.find({status:status})
 
-        res.status(201).json({ status: true, userAnswer });
-    } catch (error) {
-        console.error('Error fetching user saved answers:', error);
+        res.status(201).json({ status: true, userAnswer:userAnswer });
+    } 
+    catch (error) 
+    {
+        console.error('Error saving quiz question:', error);
         res.status(500).json({ status: false, error: 'Server error' });
     }
 });
-
 
 
 router.get('/fetch-quiz/:year/:month', async (req, res) => 
@@ -594,7 +398,7 @@ router.get('/all-course', async (req, res) => {
     console.log("all course get route")
     try{
 
-    const allCourseData = await allCourse.find({})
+    const allCourseData = await subCourse.find({})
 
     res.send({ "status": "true", allCourse:allCourseData });
 
@@ -612,7 +416,7 @@ router.get('/sub-course', async (req, res) => {
     console.log("sub course get route",mainCourse)
     try{
 
-    const subCourseData = await allCourse.find({mainCourse:mainCourse})
+    const subCourseData = await subCourse.find({mainCourse:mainCourse})
 
     res.send({ "status": "true", subCourse:subCourseData });
 
@@ -623,7 +427,3 @@ router.get('/sub-course', async (req, res) => {
 
     }
 });
-
-
-
-module.exports = router;
