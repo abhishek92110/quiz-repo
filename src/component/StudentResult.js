@@ -21,6 +21,7 @@ function StudentResult() {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [percentage, setPercentage] = useState(0);
   const [grade, setGrade] = useState("F");
+  const [date, setDate] = useState()
 
   useEffect(() => {
     // Reset data and fetch new data when category changes
@@ -70,6 +71,7 @@ function StudentResult() {
         updatemarks(data.userAnswer[0]);
         setName(data.userAnswer[0].username)
     setCategory(data.userAnswer[0].category)
+    setDate(data.userAnswer[0].date)
       } else {
         setQuizData([]); // Clear state if no data is found
       }
@@ -88,24 +90,7 @@ function StudentResult() {
     const percentage = parseInt(((data.marks / totalQuestions) * 100).toFixed(2));
     console.log("Update marks func:", data, data.question.length,percentage);
 
-    if(percentage>80){
-
-      setGrade("A")
-
-    }
-    else if(percentage>70 && percentage<80){
-      setGrade("B")
-    }
-    else if(percentage>60 && percentage<70){
-      setGrade("C")
-    }
-    else if(percentage>=50 && percentage<60){
-      console.log("else if percentage > 50")
-      setGrade("C")
-    }
-    else{
-      setGrade("F")
-    }
+    percentage>=70?setGrade("Pass"):setGrade("Fail")
 
     setMarks(data.marks);
     setTotalQuestions(totalQuestions);
@@ -128,17 +113,18 @@ function StudentResult() {
 
     const doc = new jsPDF();
     doc.setFontSize(18);
-    doc.text("Quiz Results", 20, 20);
+    doc.text("Quiz Results", 20, 10);
 
     // Add stats
     doc.setFontSize(12);
-    doc.text(`Name: ${name}`, 20, 30);
-    doc.text(`Grade: ${grade}`, 20, 40);
+    doc.text(`Name: ${name}`, 20, 20);
+    doc.text(`Course: ${category}`, 20, 30);
+    doc.text(`Result: ${grade}`, 20, 40);
     doc.text(`Total Questions: ${totalQuestions}`, 20, 50);
     doc.text(`Correct Answers: ${correctAnswers}`, 20, 60);
     doc.text(`Incorrect Answers: ${incorrectAnswers}`, 20, 70);
     doc.text(`Your Score: ${percentage}%`, 20, 80);
-    doc.text(`Passing Score: 60%`, 20, 90);
+    doc.text(`Passing Score: 70%`, 20, 90);
 
     // Add Q&A table
     doc.text("Question and Answers:", 20, 110);
@@ -210,18 +196,34 @@ function StudentResult() {
         {/* Conditionally Render Stats or QNA */}
         {quizData && quizData.question && quizData.question.length > 0 ? (
           activeTab === "stats" ? (
-            <div className="stats-container bg-cover-color">
-              <h2>Learning is a journey. Keep going, and you'll get there.</h2>
-              <div className="stats-details">
-                <div>Name: {name}</div>
-                <div>Grade: {grade}</div>
-                <div>Total Questions: {totalQuestions}</div>
-                <div>Correct Answers: {correctAnswers}</div>
-                <div>Incorrect Answers: {incorrectAnswers}</div>
-                <div>Your Score: {percentage}%</div>
-                <div>Passing Score: 60%</div>
-              </div>
-            </div>
+            // <div className="stats-container bg-cover-color">
+            //   <h2>Learning is a journey. Keep going, and you'll get there.</h2>
+            //   <div className="stats-details">
+            //     <div>Name: {name}</div>
+            //     <div>Course: {category}</div>
+            //     <div>Result: {grade}</div>
+            //     <div>Total Questions: {totalQuestions}</div>
+            //     <div>Correct Answers: {correctAnswers}</div>
+            //     <div>Incorrect Answers: {incorrectAnswers}</div>
+            //     <div>Your Score: {percentage}%</div>
+            //     <div>Passing Score: 70%</div>
+            //   </div>
+            // </div>
+
+<div className="stats-container bg-cover-color">
+<h2>Learning is a journey. Keep going, and you'll get there.</h2>
+<div className="stats-details">
+  <div className="result-div"><div><p className="student-detail-span">Name </p><b>:</b> <span>{name}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Quiz Date </p><b>:</b><span>{date}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Result </p><b>:</b><span>{grade}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Course </p><b>:</b><span>{category}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Total Questions </p><b>:</b><span>{totalQuestions}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Correct Answers </p><b>:</b><span>{correctAnswers}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Incorrect Answers </p><b>:</b><span>{incorrectAnswers}</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Your Score </p><b>:</b><span>{percentage}%</span></div></div>
+  <div className="result-div"><div><p className="student-detail-span">Passing Score </p><b>:</b><span>70%</span></div></div>
+</div>
+</div>
           ) : (
             <div className="qna-container">
               <button className="pdf-button" onClick={downloadPDF}>

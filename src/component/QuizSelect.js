@@ -123,12 +123,15 @@ const QuizHomePage = () => {
   
 
   const getSubCourse = async()=>{
+
     let data = await contextValue.getSubCourse();
 
     console.log("data of sub course =",data.subCourse[0].subCourse)
+    // console.log(" data of sub course = ",data)
 
     setSubCourse(data.subCourse[0].subCourse)
     getActiveQuiz(data.subCourse[0].subCourse)
+    
   }
 
   const handlePlay = () => {

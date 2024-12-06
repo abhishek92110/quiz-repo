@@ -214,7 +214,7 @@ const Exam = () => {
             </div>
         </div>
 
-        <table className="table">
+        <table className="table exam-table">
           <thead>
             <tr>
               <th scope="col">S No.</th>

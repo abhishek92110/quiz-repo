@@ -31,7 +31,7 @@ const UpdateMarks = () => {
       },
       body: JSON.stringify({
         question: userAnswer,
-        category: localStorage.getItem("userCourse"),
+        category: localStorage.getItem("category"),
         id: localStorage.getItem("userId"),
         marks: totalMarks,
       }),
@@ -112,7 +112,7 @@ const UpdateMarks = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          category: localStorage.getItem("userCourse"),
+          category: localStorage.getItem("category"),
           id: localStorage.getItem("userId"),
         },
       }

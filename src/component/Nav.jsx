@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AppContext } from './context/AppContext';
 import Loading from './Loading';
+import iQuizLogo from '../image/iQuizLogo.png'
 
 const Nav = (props) => {
 
@@ -26,8 +27,6 @@ const Nav = (props) => {
     navigate('/register')
     },2000)
 
-
-
   }
 
   return (
@@ -35,7 +34,7 @@ const Nav = (props) => {
     {loadingStatus &&  <Loading/>}
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container-fluid">
-          <Link className="navbar-brand" to={props.status?"/register":"/"}>iQuiz</Link>
+          <Link className="navbar-brand" to={props.status?"/register":"/"}><img className='logo-image' src={iQuizLogo}/></Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -53,14 +52,17 @@ const Nav = (props) => {
               <li className="nav-item">
 
                 <NavLink className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} to="/quiz-result">
-                Result
+                <strong>Result</strong>
                 </NavLink>
                 
                
               </li>
+
+         <li><strong className='text-dark mr-4' >{localStorage.getItem("name")}</strong></li>
+        <li> <strong className='text-dark pointer' onClick={handleLogOut}>Log Out</strong></li>
+        
             </ul>
 
-         <strong className='text-dark pointer' onClick={handleLogOut}>{localStorage.getItem("name")}</strong>
            
           </div>
 }

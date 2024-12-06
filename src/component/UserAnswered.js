@@ -31,7 +31,8 @@ const UserAnswered = () => {
           endDate:formatDate(new Date())
         }
 
-        getUnAnswerUser("all",objDate,false)
+        getUnAnswerUser("all",false,objDate)
+        setDateRange(objDate)
 
         setDate(date)
 
@@ -56,7 +57,7 @@ const UserAnswered = () => {
   }
 
 
-    const getUnAnswerUser = async(course,value)=>{
+    const getUnAnswerUser = async(course,value,dateRange)=>{
       console.log("user answer route =",dateRange)
       setLoadingStatus(true)
         let data = await fetch("https://blockey.in:8000/get-user-saved-answer", {
@@ -81,11 +82,12 @@ const UserAnswered = () => {
           },[2000])
 }
 
-const handleShow = (data)=>{
+const handleShow = (data)=>
+  {
 
     console.log("data =",data)
     localStorage.setItem('userId',data.user)
-    localStorage.setItem('userCourse',data.category)
+    localStorage.setItem('category',data.category)
     answerStatus==false?navigate("/update-marks"):navigate("/student-result")
 
 }
@@ -218,7 +220,7 @@ return (
             <div className="">
                 <button
                     className="btn btn-primary"
-                    onClick={() => getUnAnswerUser(course, answerStatus)}
+                    onClick={() => getUnAnswerUser(course, answerStatus, dateRange)}
                 >
                     Search
                 </button>
@@ -229,7 +231,7 @@ return (
     
     className='custom-select my-4'
     value={answerStatus}
-    onChange={(e)=>{setAnswerStatus(e.target.value);getUnAnswerUser(course,e.target.value)}}
+    onChange={(e)=>{setAnswerStatus(e.target.value);getUnAnswerUser(course,e.target.value,dateRange)}}
     >
             <option value="true">Done</option>
             <option value="false">Pending</option>

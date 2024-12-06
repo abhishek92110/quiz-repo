@@ -34,6 +34,8 @@ function App() {
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [googleStatus, setGoogleStatus] = useState(false)
   const [allCourse, setAllCourse] = useState([])
+  const [emptyFieldStatus, setEmptyFieldStatus] = useState(true)
+  const [emptyClick, setEmptyClick]  = useState(false)
 
   // State to store form data
   const [formData, setFormData] = useState({
@@ -73,6 +75,28 @@ function App() {
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let tempFormData = formData;
+
+    tempFormData[name] = value;
+
+    let emptyfield = false; // Assume all fields are filled initially
+
+    console.log("temp form data =",tempFormData, formData)
+for (let key in tempFormData) {
+  console.log("temp form data key =",key,tempFormData[key])
+  if (tempFormData[key] == '') {
+    console.log("if condition of formData =",emptyfield)
+    emptyfield = true; // If any field is empty, set this to false
+    break; // No need to check further if one field is empty
+  }
+}
+
+setEmptyFieldStatus(emptyfield);
+
+if(emptyClick){
+  setEmptyClick(emptyfield)
+}
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -81,10 +105,15 @@ function App() {
 
   // Handle manual registration
   const register = async (e) => {
+    e.preventDefault();
+    setEmptyClick(emptyFieldStatus)
+    console.log("empty field status =",emptyFieldStatus)
+    if(!emptyFieldStatus){
     setLoadingStatus(true)
-    e.preventDefault(); // Prevent the default form submission
 
-    try {
+    try 
+    {
+
       const response = await fetch("https://blockey.in:8000/add-user", {
         method: 'POST',
         headers: {
@@ -96,22 +125,31 @@ function App() {
       const result = await response.json();
       setGoogleStatus(false)
 
-      console.log("result manual add =",result)
+      console.log(" result manual add = ",result)
 
       localStorage.setItem("token",result.token);
       localStorage.setItem("name",result.name)
       localStorage.setItem("userCourse",result.course)
 
-      if (response.ok) {
+      if (response.ok) 
+      {
         setLoadingStatus(false)
         navigate('/select-quiz');
-      } else {
+      } 
+      else 
+      {
         alert(result.message || 'Registration failed');
       }
-    } catch (error) {
+
+    
+    } 
+    catch (error) 
+    {
       console.error('Error:', error);
       alert('An error occurred. Please try again.');
     }
+
+  }
   };
 
   const provider  = new GoogleAuthProvider()  
@@ -139,7 +177,7 @@ function App() {
 
       // Prepare data to send to your backend
 
-      setFormData({["name"]:user.displayName, ["email"]:user.email})
+      setFormData({["name"]:user.displayName, ["email"]:user.email, ["trainer"]:"", ["course"]:""})
 
       const googleUserData = {
         name: user.displayName,
@@ -151,36 +189,22 @@ function App() {
       setGoogleStatus(true)
 
       console.log("google user data =",googleUserData)
-
-      // Send data to your API
-      // const response = await fetch("https://blockey.in:8000/add-user", {
-      //   method: 'POST',
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(googleUserData),
-      // });
-
-      // const result2 = await response.json();
-      // localStorage.setItem("token", result2.token);
-      // localStorage.setItem("name", result2.name);
-      
-
-      // if (response.ok) {
-      //   setLoadingStatus(false);
-      //   navigate('/select-quiz');
-      // }
-        
-      // else {
-      //   alert(result2.message || 'Google Login failed');
-      // }
     
+
   } catch (error) {
     console.error('Google Sign-In Error:', error);
     alert('An error occurred during Google Login. Please try again.');
   } finally {
     setLoadingStatus(false);
   }
+};
+
+const isFormValid = () => {
+  const { name, email, number, trainer, course } = formData;
+  // Check if all fields are filled
+
+  console.log("is form valid =",name,email,number,trainer,course,(name && email && number && trainer && course))
+  return name && email && number && trainer && course;
 };
 
   return (
@@ -204,6 +228,7 @@ function App() {
               name="name"
               value={formData.name}
               onChange={handleChange}
+              required
             />
           </div>
 
@@ -216,6 +241,7 @@ function App() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              required
             />
           </div>
 
@@ -228,6 +254,7 @@ function App() {
               name="number"
               value={formData.number}
               onChange={handleChange}
+              required
             />
           </div>
 
@@ -240,6 +267,7 @@ function App() {
               name="trainer"
               value={formData.trainer}
               onChange={handleChange}
+              required
             />
           </div>
 
@@ -250,6 +278,7 @@ function App() {
               className="custom-select"
               name="course"
               onChange={handleChange}
+              required
               
             >
               <option selected disabled>--- Select Course ---</option>
@@ -262,6 +291,7 @@ function App() {
         </div>
 
           <button type="submit" className="register-btn">Register</button>
+          {emptyClick && <span className='detail-warning'>*Please fill all the details</span>}
         </form>
 
         <div className="google-login" onClick={handleGoogleLogin}>
@@ -286,9 +316,11 @@ function App() {
           <label htmlFor="course">Course</label>
           
           <select
+
               className="custom-select"
               name="course"
               onChange={handleChange}
+              required
               
             >
               <option selected disabled>--- Select Course ---</option>
@@ -309,6 +341,7 @@ function App() {
             name="number"
             value={formData.number}
             onChange={handleChange}
+            
           />
         </div>
 
@@ -321,10 +354,12 @@ function App() {
             name="trainer"
             value={formData.trainer}
             onChange={handleChange}
+            
           />
         </div>
 
         <button type="submit" className="register-btn">Register</button>
+        {emptyClick && <span className='detail-warning'>*Please fill all the details</span>}
       </form>
     </div>
   </div>}

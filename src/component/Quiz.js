@@ -97,7 +97,15 @@ function Quiz() {
 
     setLoadingStatus(true);
 
-    const question = allQuestion.map((q, index) => ({
+    let subjectiveStatus = false
+
+    const question = allQuestion.map((q, index) => 
+    {
+      if(q.type=="subjective" && (!subjectiveStatus))
+      
+        subjectiveStatus = true
+
+      ({
       question: q.question,
       yourAnswer:
         screenChangeCount > 2 && index >= currentQuestionIndex
@@ -113,7 +121,7 @@ function Quiz() {
           : userAnswers[index] === q.answer
           ? 1
           : 0,
-    }));
+    })});
 
     fetch('https://blockey.in:8000/save-quiz-question', {
       method: 'POST',
@@ -124,7 +132,7 @@ function Quiz() {
       body: JSON.stringify({
         question,
         category: localStorage.getItem('category'),
-        status: false,
+        status: (!subjectiveStatus),
         date:localStorage.getItem("date"),
         marks: question.reduce((sum, q) => sum + (q.points === 1 ? 1 : 0), 0),
       }),
@@ -160,7 +168,14 @@ function Quiz() {
 
     setMarks(totalMarks);
 
-    const question = allQuestion.map((q, index) => ({
+    let subjectiveStatus = false;
+
+    const question = allQuestion.map((q, index) => 
+    {
+      if(q.type=="subjective" && (!subjectiveStatus)){
+        subjectiveStatus = true
+      }
+      return({
       question: q.question,
       yourAnswer: userAnswers[index] || 'Not Answered',
       correctAnswer: q.type === 'subjective' ? 'N/A' : q.answer,
@@ -171,7 +186,7 @@ function Quiz() {
           : userAnswers[index] === q.answer
           ? 1
           : 0,
-    }));
+    })});
 
     await fetch('https://blockey.in:8000/save-quiz-question', {
       method: 'POST',
@@ -182,7 +197,7 @@ function Quiz() {
       body: JSON.stringify({
         question,
         category: localStorage.getItem('category'),
-        status: false,
+        status: (!subjectiveStatus),
         date:localStorage.getItem("date"),
         marks: totalMarks,
       }),

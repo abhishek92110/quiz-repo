@@ -193,6 +193,18 @@
   }
 }
 @media screen and (max-width:500px){
+
+  .stats-container h2{
+    font-size: 18px !important;
+  }
+
+  .home-btn-container{
+    flex-direction: column;
+    row-gap: 30px;
+    align-items: initial !important;
+    padding: 15px;
+  }
+
   .question-number{
     font-size: 12px;
   }
@@ -309,12 +321,24 @@
   margin-bottom: 20px;
 }
 
-.stats-details div {
+.stats-details .result-div {
   font-size: 18px;
   padding: 10px;
   margin: 5px 0;
   background-color: #f9f9f9;
   border-radius: 5px;
+}
+
+.result-div div{
+  text-align: initial;
+  display: flex;
+  column-gap: 30px;
+   
+}
+.result-div div span{
+  width: 50%;
+  display: inline-block;
+  font-size: 14px;
 }
 
 /* QNA Container */
@@ -335,12 +359,29 @@
   cursor: auto !important;
 }
 
+.student-detail-span{
+  width: 50%;
+  font-size: 14px;
+}
+
 .start-end-section{
   display: flex;
 }
 
 .deactive:hover{
   background-color: white !important;
+}
+
+.detail-warning{
+  color: red;
+}
+
+.nav-item a{
+  padding: 0;
+}
+
+.logo-image{
+  height: 50px;
 }
 
 .pdf-button {
@@ -652,7 +693,7 @@ select {
 }
 
 #navbarNav{
-  justify-content: space-between;
+  justify-content: end;
 }
 
 .text-dark{
@@ -712,4 +753,26 @@ select {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
+}
+
+
+.navbar-expand-lg .navbar-nav{
+  column-gap: 20px;
+}
+
+@media screen and (max-width:768px){
+  .course-date-section{
+    flex-direction: column;
+    align-items: initial;
+    margin-bottom: 15px;
+  }
+}
+
+@media screen and (max-width:320px){
+  .exam-table td{
+    font-size: 12px;
+  }
+  .exam-table th{
+    font-size: 12px;
+  }
 }

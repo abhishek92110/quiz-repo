@@ -22,6 +22,8 @@ function Admin() {
     const verifyAdmin = async()=>{
         const response = await contextValue.verifyAdmin()
 
+        console.log("verify admin response =",response)
+
         if(!(response.status)){
             navigate('/admin-login')
         }

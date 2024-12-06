@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from './context/AppContext';
 import { signInWithPopup, GoogleAuthProvider, signInWithRedirect, signInWithCredential, getAuth } from "firebase/auth";
 
 
@@ -28,20 +29,60 @@ const firebaseConfig =
 };
 
 function Adminlogin() {
+  const contextValue = useContext(AppContext);
   const navigate = useNavigate();
   const [loadingStatus, setLoadingStatus] = useState(false)
+  const [emptyFieldStatus, setEmptyFieldStatus] = useState(true)
+  const [emptyClick, setEmptyClick]  = useState(false)
 
   // State to store form data
   const [formData, setFormData] = useState({
-    name: '',
+    password:'',
     email: '',
-    number: '',
-    trainer: '',
   });
 
+
+  useEffect(()=>{
+
+    // verifyAdmin()
+
+  },[])
+
   // Handle input change
+  // const handleChange = (e) => { 
+
+  //   const { name, value } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let tempFormData = formData;
+
+    tempFormData[name] = value;
+
+    let emptyfield = false; // Assume all fields are filled initially
+
+    console.log("temp form data =",tempFormData, formData)
+for (let key in tempFormData) {
+  console.log("temp form data key =",key,tempFormData[key])
+  if (tempFormData[key] == '') {
+    console.log("if condition of formData =",emptyfield)
+    emptyfield = true; // If any field is empty, set this to false
+    break; // No need to check further if one field is empty
+  }
+}
+
+setEmptyFieldStatus(emptyfield);
+
+if(emptyClick){
+  setEmptyClick(emptyfield)
+}
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -50,9 +91,13 @@ function Adminlogin() {
 
   // Handle manual registration
   const register = async (e) => {
-    setLoadingStatus(true)
-    e.preventDefault(); // Prevent the default form submission
+ 
+    e.preventDefault(); 
+    setEmptyClick(emptyFieldStatus)// Prevent the default form submission
 
+    if(!emptyFieldStatus)
+      {
+    setLoadingStatus(true)
     try {
       const response = await fetch("https://blockey.in:8000/admin-login", {
         method: 'POST',
@@ -72,11 +117,26 @@ function Adminlogin() {
         alert('Credential Invalid');
         setLoadingStatus(false)
       }
-    } catch (error) {
+    } 
+    
+    catch (error) {
       console.error('Error:', error);
       alert('An error occurred. Please try again.');
     }
+  }
+
   };
+
+
+  const verifyAdmin = async()=>{
+    const response = await contextValue.verifyAdmin()
+
+    console.log("verify admin response =",response)
+
+    if(response.status){
+        navigate('/admin')
+    }
+}
 
 
   return (
@@ -113,6 +173,7 @@ function Adminlogin() {
           </div>
 
           <button type="submit" className="register-btn">Log In</button>
+          {emptyClick && <span className='detail-warning'>*Please fill all the details</span>}
         </form>
 
       </div>
