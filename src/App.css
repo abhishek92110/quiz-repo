@@ -544,16 +544,44 @@ select {
   border: 1px solid #ddd;
 }
 
-.home-btn-container
+/* .home-btn-container
 {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 91vh;
   column-gap: 50px;
+  background-image: url("./image/iQuizLogo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
   
+} */
+
+
+.home-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
+  column-gap: 50px;
+  position: relative; /* Make it relative for positioning pseudo-element */
+  z-index: 1; /* Ensure content stays above the pseudo-element */
 }
 
+.home-btn-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("./image/iQuizLogo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  opacity: 0.3; /* Adjust opacity as needed */
+  z-index: -1; /* Place behind the content */
+}
 .home-btn-container button{
  height: fit-content;
  padding: 8px 25px;
@@ -571,7 +599,7 @@ select {
 
 .home-container{
 
-  background-image: url("./image/quiz.jpg");
+  /* background-image: url("./image/quiz.jpg"); */
   background-repeat: no-repeat;
   background-size: cover;
 

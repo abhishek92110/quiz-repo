@@ -207,7 +207,7 @@ const getSubCourse = async()=>{
         </div>
 
         {/* Conditionally Render Stats or QNA */}
-        {console.log("inside design ",typeof(quizData.status))}
+        {console.log("inside design ",typeof(quizData.status),quizData.status,quizData)}
        {(quizData.status=="false") && <h1 className="c-center">Result is in Evaluation we will keep you update</h1>
 }     
    {quizData && quizData.question && quizData.question.length > 0 ? (

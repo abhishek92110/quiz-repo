@@ -52,8 +52,9 @@ function StudentResult() {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                category: localStorage.getItem("userCourse"),
+                category: localStorage.getItem("category"),
                 id: localStorage.getItem("userId"),
+                examDate:localStorage.getItem("examDate")
               },
             }
           );
@@ -75,7 +76,8 @@ function StudentResult() {
       } else {
         setQuizData([]); // Clear state if no data is found
       }
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error fetching quiz data:", error);
     } finally {
       setLoading(false); // Ensure loading is false after fetch

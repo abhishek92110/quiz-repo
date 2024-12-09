@@ -99,30 +99,6 @@ router.post('/upload-questions', upload.single('file'), async (req, res) => {
     }
 });
 
-// route to get course and date wise question 
-
-// router.get("/get-course-date-exam",async(req,res)=>{
-  
-//     const course = req.header("course")
-//     const date   = req.header("examDate")  
-
-//     console.log("exam and date =",course,date)
-
-//     let getExam;
-
-//     if(course=="all"){
-
-//         getExam = await questiondb.find({date:date})
-//     }
-
-//     else{
-//         getExam = await questiondb.find({category:course, date:date})
-//     }
-//     res.send({status:true, length:getExam.length,data:getExam})
-
-    
-    
-// })
 
 router.get("/get-course-date-exam", async (req, res) => 
     {
@@ -183,6 +159,27 @@ router.put("/update-exam-status",async(req,res)=>{
 
     
     
+})
+
+// route to delete exam 
+
+router.delete("/delete-exam",async(req,res)=>{
+
+    console.log("delete exam route is running =",req.body)
+  
+    try{
+    const data = req.body
+
+    await questiondb.deleteOne({_id:data.id})
+   
+    res.send({status:true})
+    }
+
+    catch(error){
+        console.log("error update exam ",error.message)
+        res.send({status:false})
+    }
+ 
 })
 
 router.post('/add-question', async (req, res) => {
@@ -429,9 +426,17 @@ router.get('/get-save-quiz-question', verifyUser, async (req, res) => {
      {
         const category = req.header("category")
 
+        const date = new Date();
+
+        const month = (date.getMonth()+1).toString().padStart(2,'0')
+        let day = (date.getDay()).toString().padStart(2,'0');
+        let year = date.getFullYear();
+
+        let fullDate = `${year}-${month}-${day}`
+
         // Include user ID from the middleware
 
-        const userAnswer = await saveQuiz.find({category:category,user:req.userId})
+        const userAnswer = await saveQuiz.find({category:category,user:req.userId, date:fullDate})
 
         res.status(201).json({ status: true, userAnswer:userAnswer });
     } 
@@ -452,6 +457,8 @@ router.get('/get-save-quiz-question-admin', async (req, res) =>
         const status   =   req.header("status")
 
         // Include user ID from the middleware
+
+        console.log("user id and category =",category, userId)
 
         let userAnswer = await saveQuiz.find({category:category,user:userId})
           

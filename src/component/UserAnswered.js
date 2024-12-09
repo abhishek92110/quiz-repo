@@ -10,7 +10,7 @@ const UserAnswered = () => {
     const contextValue = useContext(AppContext);
     const [UserAnswer, setUserAnswer] = useState([])
     const [loadingStatus, setLoadingStatus] = useState(false)
-    const [answerStatus, setAnswerStatus] = useState(false)
+    const [answerStatus, setAnswerStatus] = useState("false")
     const [date, setDate] = useState()
     const [course, setCourse]  = useState("all")
     const [subCourse, setSubCourse] = useState([])
@@ -88,7 +88,8 @@ const handleShow = (data)=>
     console.log("data =",data)
     localStorage.setItem('userId',data.user)
     localStorage.setItem('category',data.category)
-    answerStatus==false?navigate("/update-marks"):navigate("/student-result")
+    localStorage.setItem("examDate",data.date)
+    answerStatus=="false"?navigate("/update-marks"):navigate("/student-result")
 
 }
 
@@ -244,7 +245,7 @@ return (
       <th scope="col">Name</th>
       <th scope="col">Email</th>
       <th scope="col">Category</th>
-      <th scope="col">{answerStatus==false?"View":"Result"}</th>
+      <th scope="col">{answerStatus=="false"?"View":"Result"}</th>
     </tr>
   </thead>
   <tbody>
@@ -259,7 +260,7 @@ return (
                 <td>{data.username}</td>
                 <td>{data.useremail}</td>
                 <td>{data.category}</td>
-                <td className='pointer' onClick={()=>handleShow(data)}>{answerStatus==false?<i class="fa-regular fa-eye"></i>:<i class="fa-solid fa-square-poll-horizontal"></i>}</td>
+                <td className='pointer' onClick={()=>handleShow(data)}>{answerStatus=="false"?<i class="fa-regular fa-eye"></i>:<i class="fa-solid fa-square-poll-horizontal"></i>}</td>
             </tr>
         )
     }

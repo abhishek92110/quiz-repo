@@ -1,6 +1,8 @@
 import React, { useEffect, useContext, useState } from "react";
 import { AppContext } from "./context/AppContext";
 import Nav from "./Nav";
+import swal from 'sweetalert';
+import Loading from "./Loading";
 
 const Exam = () => {
   const contextValue = useContext(AppContext);
@@ -13,18 +15,19 @@ const Exam = () => {
   const [customRange, setCustomRange] = useState(false);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
+
   useEffect(() => {
     const year = new Date().getFullYear();
     const month = (new Date().getMonth() + 1).toString().padStart(2, "0");
     const day = new Date().getDate().toString().padStart(2, "0");
 
     const todayDate = `${year}-${month}-${day}`;
-    setDate(todayDate)
-
+    
     let objDate = {
       startDate:formatDate(new Date()),
       endDate:formatDate(new Date())
     }
+    setDateRange(objDate)
 
     getExam("all",objDate);
     getAllCourse();
@@ -149,9 +152,57 @@ const Exam = () => {
     console.log("View details:", data);
   };
 
+  const handleDelete = async (data) => {
+
+    console.log("date range delete api call start=",dateRange)
+    // Show SweetAlert confirmation dialog
+    swal({
+        title: "Are you sure?",
+        text: `Do you want to delete the "${data.category}" exam scheduled for ${data.date}?`,
+        icon: "warning",
+        buttons: ["Cancel", "Yes, Delete"],
+        dangerMode: true,
+    }).then(async (willDelete) => {
+        if (willDelete) {
+            setLoadingStatus(true);
+            console.log("delete id =", data._id);
+
+            try {
+                let response = await fetch("https://blockey.in:8000/delete-exam", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        id: data._id,
+                    }),
+                });
+
+                response = await response.json();
+
+                if (response.status) {
+                    swal("Success", "The exam has been deleted successfully.", "success");
+                    console.log("date range delete api call =",dateRange)
+                    getExam(course,dateRange)
+                 
+                } else {
+                    swal("Error", "Failed to delete the exam. Please try again.", "error");
+                    setLoadingStatus(false);
+                }
+            } catch (error) {
+                console.error("Error deleting exam:", error);
+                swal("Error", "Something went wrong. Please try again.", "error");
+                setLoadingStatus(false);
+            }
+        }
+    });
+};
+
   return (
     <div>
       <Nav />
+
+      {loadingStatus && <Loading/>}
 
       <div className={`container my-4 ${loadingStatus && "overlay"}`}>
       <div className="course-date-section">
@@ -257,9 +308,9 @@ const Exam = () => {
                   >
                     <i className="fa-regular fa-eye"></i>
                   </td>
-                  <td
+                   <td 
                     className="pointer"
-                    onClick={() => handleShow(data)}
+                    onClick={() => handleDelete(data)}
                   >
                     <i class="fa-solid fa-trash"></i>
                   </td>
